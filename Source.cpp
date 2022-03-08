@@ -1,27 +1,56 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
-#include <cstring>
+#include <string>
 using namespace std;
-
-
+struct COURSE_DATA
+{
+	//course id, course name, teacher name, number of credits, the maximum number of students in the course(default 50), day of the week, and the session that the course will be performed(MON / TUE / WED / THU / FRI / SAT, S1(07:30), S2(09:30), S3(13:30) and S4(15:30)).A course will be taught in 2 sessions in a week
+	string id, course_name, teacher_name, number_of_credits, max_num_student, days_of_week;
+};
+struct Node_course
+{
+	COURSE_DATA data;
+	Node_course* course_next;
+};
+struct Node_semester
+{
+	string semester_no;
+	Node_course* ph_course;
+	Node_semester* semester_next;
+};
+struct DATE
+{
+	int ngay;
+	int thang;
+	int nam;
+};
+struct SINHVIEN
+{
+	string No, ID, first_name, lastname, gender, social_ID;
+	DATE date;
+};
+//Node sinh viên
 struct Node_student
 {
-	//No, Student ID, First name, Last name, Gender, Date of Birth, Social ID.
-	string No, ID, first_name, lastname, gender, date_of_birth, social_ID;
+	SINHVIEN data;
 	Node_student* student_next;
 };
+//Node lớp học
 struct Node_class
 {
 	string name;
 	Node_class* class_next;
 	Node_student* ph_student;
 };
+//Node năm học
 struct Node_year
 {
 	string name;
 	Node_year* year_next;
 	Node_class* ph_classes;
+	Node_semester* ph_semester;
 };
+//Hàm để in ra các lớp học
 void print_class(Node_class* ph_class)
 {
 	Node_class* pc_class = ph_class;
@@ -31,6 +60,7 @@ void print_class(Node_class* ph_class)
 		pc_class = pc_class->class_next;
 	}
 }
+//Hàm để in ra các năm học
 void print_year(Node_year* ph_year)
 {
 	Node_year* pc = ph_year;
@@ -41,6 +71,7 @@ void print_year(Node_year* ph_year)
 		pc = pc->year_next;
 	}
 }
+//Hàm để tìm Node năm học được chọn
 Node_year* find_year(Node_year* ph_year, string year_name)
 {
 	Node_year* pc_year = ph_year;
@@ -48,7 +79,7 @@ Node_year* find_year(Node_year* ph_year, string year_name)
 		pc_year = pc_year->year_next;
 	return pc_year;
 }
-
+//Hàm để tìm Node lớp học được chọn
 Node_class* find_class(Node_class* ph_class, string class_name)
 {
 	Node_class* pc_class = ph_class;
@@ -56,11 +87,13 @@ Node_class* find_class(Node_class* ph_class, string class_name)
 		pc_class = pc_class->class_next;
 	return pc_class;
 }
+//Hàm để thêm năm học vào
 void add_year(Node_year*& ph_year, string year_name)
 {
 	Node_year* tmp = new Node_year;
 	tmp->name = year_name;
 	tmp->ph_classes = NULL;
+	tmp->ph_semester = NULL;
 	tmp->year_next = NULL;
 	if (ph_year == NULL)
 	{
@@ -74,6 +107,7 @@ void add_year(Node_year*& ph_year, string year_name)
 		pc->year_next = tmp;
 	}
 }
+//Hàm để thêm lớp học vào 
 void add_class(Node_class*& ph_class)
 {
 	string class_name;
@@ -97,15 +131,33 @@ void add_class(Node_class*& ph_class)
 	//print classes
 	print_class(ph_class);
 }
+//Hàm để add ngày sinh
+DATE add_birthday(ifstream &read)
+{
+	DATE date;
+	read >> date.ngay;
+	read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
+	read >> date.thang;
+	read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
+	read >> date.nam;
+	return date;
+}
+//Hàm để thêm hồ sơ các sinh viên năm nhất vào
 void add_1st_student(Node_student*& ph_student)
 {
 	ifstream read("csv.txt", ios::in);
-	int n; read >> n;
 	Node_student* pc_student = ph_student;
-	for (int i = 0; i < n; i++)
+	int i = 2;
+	while (i-- != 0)
 	{
 		Node_student* tmp = new Node_student;
-		read >> tmp->No >> tmp->ID >> tmp->first_name >> tmp->lastname >> tmp->gender >> tmp->date_of_birth >> tmp->social_ID;
+		getline(read, tmp->data.No, ','); read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
+		getline(read, tmp->data.ID, ','); read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
+		getline(read, tmp->data.first_name, ','); read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
+		getline(read, tmp->data.lastname, ','); read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
+		getline(read, tmp->data.gender, ','); read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
+		tmp->data.date = add_birthday(read); read.seekg(2, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
+		getline(read, tmp->data.social_ID);
 		tmp->student_next = NULL;
 		if (pc_student == NULL)
 		{
@@ -117,16 +169,33 @@ void add_1st_student(Node_student*& ph_student)
 			pc_student->student_next = tmp;
 			pc_student = pc_student->student_next;
 		}
-
 	}
+	read.close();
+	//in ra thông tin sinh viên vừa mới add vào
 	pc_student = ph_student;
 	while (pc_student != NULL)
 	{
-		cout << pc_student->No << endl << pc_student->ID << endl << pc_student->first_name << endl << pc_student->lastname << endl << pc_student->gender << endl << pc_student->date_of_birth << endl << pc_student->social_ID << endl;
+		cout << pc_student->data.No << endl << pc_student->data.ID << endl << pc_student->data.first_name << endl << pc_student->data.lastname << endl << pc_student->data.gender <<  endl << pc_student->data.date.ngay << "/" << pc_student->data.date.thang << "/" << pc_student->data.date.nam <<endl <<pc_student->data.social_ID << endl;
 		pc_student = pc_student->student_next;
 	}
 }
-
+void add_semester(Node_semester* ph_semester, int no)
+{
+	string semester_no_tmp = "Semester " + to_string(no);
+	Node_semester* tmp = new Node_semester;
+	tmp->semester_no = semester_no_tmp;
+	if (ph_semester == NULL)
+	{
+		ph_semester = tmp;
+	}
+	else
+	{
+		Node_semester* pc_semester = ph_semester;
+		while (pc_semester->semester_next != NULL)
+			pc_semester = pc_semester->semester_next;
+		pc_semester->semester_next = tmp;
+	}
+}
 
 int main()
 {
@@ -148,13 +217,14 @@ int main()
 		{
 			print_year(ph_year);
 			string year_name;
+			int semester_num = 1;
 			cout << "Choose year: "; cin >> year_name;
 			Node_year* year_choose = find_year(ph_year, year_name);
 			int choices;
 
 			do
 			{
-				cout << "1.Create class" << endl << "2.Add Students" << endl;
+				cout << "1.Create class" << endl << "2.Add Students" << "3.Add Semester" << endl;
 				cin >> choices;
 				if (choices == 1)
 				{
@@ -168,6 +238,10 @@ int main()
 					cout << "Choose class: "; cin >> class_name;
 					Node_class* class_choose = find_class(year_choose->ph_classes, class_name);
 					add_1st_student(class_choose->ph_student);
+				}
+				if (choices == 3)
+				{
+					add_semester(year_choose->ph_semester, semester_num++);
 				}
 			} while (choice != 0);
 
