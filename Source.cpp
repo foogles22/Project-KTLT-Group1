@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <string>
 using namespace std;
@@ -107,7 +107,7 @@ void add_year(Node_year*& ph_year, string year_name)
 		pc->year_next = tmp;
 	}
 }
-//Hàm để thêm lớp học vào 
+//Hàm để thêm lớp học vào
 void add_class(Node_class*& ph_class)
 {
 	string class_name;
@@ -196,7 +196,36 @@ void add_semester(Node_semester* ph_semester, int no)
 		pc_semester->semester_next = tmp;
 	}
 }
-
+// hàm xóa Node_class
+void deallocate_class(Node_class *&ph_class)
+{
+  while(ph_class != NULL)
+  {
+      Node_class *pc_class = ph_class -> class_next;
+      delete ph_class;
+      ph_class = pc_class;
+  }
+}
+// hàn xóa Node_student
+void deallocate_student(Node_student *&ph_student)
+{
+  while(ph_student != NULL)
+  {
+      Node_student *pc_student = ph_student -> student_next;
+      delete ph_student;
+      ph_student = pc_student;
+  }
+}
+// hàm xóa Node year
+void deallocate_year(Node_year *&ph_year)
+{
+  while(ph_year != NULL)
+  {
+      Node_year *pc_year = ph_year -> year_next;
+      delete ph_year;
+      ph_year = pc_year;
+  }
+}
 int main()
 {
 	Node_year* ph_year = NULL;
