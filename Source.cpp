@@ -2,40 +2,38 @@
 #include <fstream>
 #include <string>
 #include <cstring>
+#include <time.h>
 using namespace std;
+struct Node_student;
 struct COURSE_DATA
 {
 	//course id, course name, teacher name, number of credits, the maximum number of students in the course(default 50), day of the week, and the session that the course will be performed(MON / TUE / WED / THU / FRI / SAT, S1(07:30), S2(09:30), S3(13:30) and S4(15:30)).A course will be taught in 2 sessions in a week
-	int start_date, end_date;
 	string id, course_name, teacher_name, number_of_credits, max_num_student, days_of_week, session1, session2;
 };
 struct Node_course
 {
 	COURSE_DATA data;
 	Node_course* course_next;
+	Node_student* ph_student_enrolled;
 };
 struct Node_semester
 {
+	int start_date, end_date;
 	string semester_no;
 	Node_course* ph_course;
 	Node_semester* semester_next;
 };
-struct DATE
-{
-	int ngay;
-	int thang;
-	int nam;
-};
+
 struct SINHVIEN
 {
-	string No, ID, first_name, lastname, gender, social_ID, password;
-	DATE date;
+	string No, ID, first_name, lastname, gender, social_ID, password,date;
 };
 //Node sinh viên
 struct Node_student
 {
 	SINHVIEN data;
 	Node_student* student_next;
+	Node_course* ph_course_enrolled;
 };
 //Node lớp học
 struct Node_class
@@ -91,7 +89,7 @@ void print_student(Node_student* ph_student)
 	Node_student *pc_student = ph_student;
 	while (pc_student != NULL)
 	{
-		cout << pc_student->data.No << endl << pc_student->data.ID << endl << pc_student->data.first_name << endl << pc_student->data.lastname << endl << pc_student->data.gender << endl << pc_student->data.date.ngay << "/" << pc_student->data.date.thang << "/" << pc_student->data.date.nam << endl << pc_student->data.social_ID << endl;
+		cout << pc_student->data.No << endl << pc_student->data.ID << endl << pc_student->data.first_name << endl << pc_student->data.lastname << endl << pc_student->data.gender << endl << pc_student->data.date << endl << pc_student->data.social_ID << endl;
 		pc_student = pc_student->student_next;
 	}
 }
@@ -148,14 +146,39 @@ Node_course* find_course(Node_course* ph_course, int course_no)
 		return pc_course;
 	else return NULL;
 }
+Node_year* find_year_by_name(Node_year* ph_year, string year_name)
+{
+	if (ph_year == NULL)
+		return NULL;
+	Node_year* pc_year = ph_year;
+	while (pc_year != NULL && pc_year->name != year_name)
+		pc_year = pc_year->year_next;
+	return pc_year;
+}
+//Hàm để tìm Node lớp học được chọn
+Node_class* find_class_by_name(Node_class* ph_class, string class_name)
+{
+	Node_class* pc_class = ph_class;
+	while (pc_class != NULL && pc_class->name != class_name)
+		pc_class = pc_class->class_next;
+	return pc_class;
+}
+Node_student* find_student_by_id(Node_student* ph_student, string id)
+{
+	Node_student* pc_student = ph_student;
+	while (pc_student != NULL && pc_student->data.ID != id)
+		pc_student = pc_student->student_next;
+	return pc_student;
+}
 //Hàm để thêm năm học vào
-void add_year(Node_year*& ph_year, string year_name)
+void add_year(Node_year*& ph_year, string year_name, Node_year* &current_year)
 {
 	Node_year* tmp = new Node_year;
 	tmp->name = year_name;
 	tmp->ph_classes = NULL;
 	tmp->ph_semester = NULL;
 	tmp->year_next = NULL;
+	current_year = tmp;
 	if (ph_year == NULL)
 	{
 		ph_year = tmp;
@@ -190,20 +213,10 @@ void add_class(Node_class*& ph_class)
 		pc_class->class_next = tmp;
 	}
 }
-//Hàm để add ngày sinh
-DATE add_birthday(ifstream& read)
-{
-	DATE date;
-	read >> date.ngay;
-	read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
-	read >> date.thang;
-	read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
-	read >> date.nam;
-	return date;
-}
 //Hàm để thêm hồ sơ các sinh viên năm nhất vào
 void add_1st_student(Node_student*& ph_student, string class_name, string year_name)
 {
+	year_name = to_string(year_name[2] - 48) + to_string(year_name[3] - 48);
 	ifstream read("StudentData\\" + year_name + "\\" + class_name + ".csv");
 	Node_student* pc_student = ph_student;
 	while (!read.eof())
@@ -214,10 +227,11 @@ void add_1st_student(Node_student*& ph_student, string class_name, string year_n
 		getline(read, tmp->data.first_name, ','); 
 		getline(read, tmp->data.lastname, ','); 
 		getline(read, tmp->data.gender, ','); 
-		tmp->data.date = add_birthday(read); read.seekg(1, 1); //dịch bit sang phải 1 byte để bỏ dấu ","
-		getline(read, tmp->data.social_ID);
+		getline(read, tmp->data.date, ',');
+		getline(read, tmp->data.social_ID, ',');
 		getline(read, tmp->data.password);
 		tmp->student_next = NULL;
+		tmp->ph_course_enrolled = NULL;
 		if (pc_student == NULL)
 		{
 			ph_student = tmp;
@@ -233,48 +247,55 @@ void add_1st_student(Node_student*& ph_student, string class_name, string year_n
 	read.close();
 	print_student(ph_student);
 }
-void add_semester(Node_semester*& ph_semester, int no)
+void add_semester(Node_semester*& ph_semester)
 {
-	string semester_no_tmp = "Semester " + to_string(no);
-	Node_semester* tmp = new Node_semester;
-	tmp->semester_no = semester_no_tmp;
-	tmp->ph_course = NULL;
-	tmp->semester_next = NULL;
-	if (ph_semester == NULL)
+	int no = 1;
+	for (int i = 0; i < 3; i++) 
 	{
-		ph_semester = tmp;
+		string semester_no_tmp = "Semester " + to_string(no++);
+		Node_semester* tmp = new Node_semester;
+		tmp->semester_no = semester_no_tmp;
+		tmp->ph_course = NULL;
+		tmp->semester_next = NULL;
+
+		if (ph_semester == NULL)
+		{
+			ph_semester = tmp;
+		}
+		else
+		{
+			Node_semester* pc_semester = ph_semester;
+			while (pc_semester->semester_next != NULL)
+				pc_semester = pc_semester->semester_next;
+			pc_semester->semester_next = tmp;
+		}
 	}
-	else
-	{
-		Node_semester* pc_semester = ph_semester;
-		while (pc_semester->semester_next != NULL)
-			pc_semester = pc_semester->semester_next;
-		pc_semester->semester_next = tmp;
-	}
+	
 }
 void add_course(Node_course*& ph_course)
 {
 	//course id, course name, teacher name, number of credits, the maximum number of students in the course(default 50), day of the week, and the session that the course will be performed(MON / TUE / WED / THU / FRI / SAT, S1(07:30), S2(09:30), S3(13:30) and S4(15:30)).A course will be taught in 2 sessions in a week
 	COURSE_DATA DATA;
-	cout << "Course ID: "; cin >> DATA.id;
+	/*cout << "Course ID: "; cin >> DATA.id;
 	cout << "Course Name: "; cin >> DATA.course_name;
 	cout << "Teacher Name: "; cin >> DATA.teacher_name;
 	cout << "Number of Credits: "; cin >> DATA.number_of_credits;
 	cout << "The maximum number of students in the course(default 50): "; cin >> DATA.max_num_student;
-	cout << "Day of the week: "; cin >> DATA.days_of_week;
-	cout << "         MON / TUE / WED / THU / FRI / SAT\n" << "S1(07:30)\n" << "S2(09:30)\n" << "S3(13:30)\n" << "S4(15:30)\n";
-	cout << "The session that the course will be performed(2 session in a week)\n" << "Session 1: "; 
+	cout << "Day of the week: "; cin >> DATA.days_of_week;*/
+	cout << "          MON / TUE / WED / THU / FRI / SAT\n" << "S1(07:30)\n" << "S2(09:30)\n" << "S3(13:30)\n" << "S4(15:30)\n";
+	cout << "The session that the course will be performed(Choose 2 session in a week)(Ex: MON_S2)\n" << "Session 1: "; 
 	cin >> DATA.session1;
+	
 	do
 	{ 
-		cout << "Session 2:"; cin >> DATA.session2;
+		cout << "Session 2: "; cin >> DATA.session2;
 
 	} while (DATA.session1 == DATA.session2);
-	cout << "Start date: "; cin >> DATA.start_date;
-	cout << "End date: "; cin >> DATA.end_date;
+	
 	Node_course* tmp = new Node_course;
 	tmp->data = DATA;
 	tmp->course_next = NULL;
+	tmp->ph_student_enrolled = NULL;
 	if (ph_course == NULL)
 	{
 		ph_course = tmp;
@@ -285,6 +306,42 @@ void add_course(Node_course*& ph_course)
 		while (pc_course->course_next != NULL)
 			pc_course = pc_course->course_next;
 		pc_course->course_next = tmp;
+	}
+}
+void add_enrolled_course(Node_course* &ph_course_enrolled, Node_course* enrolled_course)
+{
+	Node_course* tmp = new Node_course;
+	tmp->data = enrolled_course->data;
+	tmp->course_next = NULL;
+	tmp->ph_student_enrolled = NULL;
+	if (ph_course_enrolled == NULL)
+	{
+		ph_course_enrolled = tmp;
+	}
+	else
+	{
+		Node_course* pc_enrolled_course = ph_course_enrolled;
+		while (pc_enrolled_course->course_next != NULL)
+			pc_enrolled_course = pc_enrolled_course->course_next;
+		pc_enrolled_course->course_next = tmp;
+	}
+}
+void add_enrolled_student(Node_student* &ph_student_enrolled, Node_student* enrolled_student)
+{
+	Node_student* tmp = new Node_student;
+	tmp->data = enrolled_student->data;
+	tmp->student_next = NULL;
+	tmp->ph_course_enrolled = NULL;
+	if (ph_student_enrolled == NULL)
+	{
+		ph_student_enrolled = tmp;
+	}
+	else
+	{
+		Node_student* pc_enrolled_student = ph_student_enrolled;
+		while (pc_enrolled_student->student_next != NULL)
+			pc_enrolled_student = pc_enrolled_student->student_next;
+		pc_enrolled_student->student_next = tmp;
 	}
 }
 void deallocate_course(Node_course*& ph_course)
@@ -386,26 +443,90 @@ bool check_year_name_appropriate(string year_name)
 		return 1;
 	else return 0;
 }
-int main()
+Node_student* find_node_student_for_login_account(long mssv, Node_year* ph_year)
 {
-	Node_year* ph_year = NULL;
+	Node_student* student_choose = NULL;
+	string year_name = "20" + to_string(mssv / 1000000) + "-" + "20" + to_string((mssv / 1000000) + 1);
+	string chatluong[8] = { "NULL","NULL","NULL","NULL","NULL","APCS","VP","CLC" };
+	string class_name = to_string(mssv / 1000000) + chatluong[(mssv / 1000) % 10];
+	Node_year* year_choose = find_year_by_name(ph_year, year_name);
+	if (year_choose == NULL)
+	{
+		cout << "School year has not been created!\n";
+		return NULL;
+	}
+	Node_class* class_choose;
+	int stt = 1;
+	do
+	{
+		class_name = class_name + to_string(stt);
+		class_choose = find_class_by_name(year_choose->ph_classes, class_name);
+		if (class_choose != NULL)
+			student_choose = find_student_by_id(class_choose->ph_student, to_string(mssv));
+		else
+		stt++;
+		if (student_choose != NULL)
+			break;
+	} while (stt < 12);
+	if (stt == 12)
+		cout << "Class has not been created!\n";
+
+	return student_choose;
+}
+bool check_course_sessions(Node_course* course_enrolled, Node_course *ph_course_enrolled)
+{
+	if (ph_course_enrolled == NULL)
+		return true;
+	Node_course* pc_course_enrolled = ph_course_enrolled;
+	while (pc_course_enrolled != NULL)
+	{
+		if (pc_course_enrolled->data.session1 == course_enrolled->data.session1 || pc_course_enrolled->data.session1 == course_enrolled->data.session2 || pc_course_enrolled->data.session2 == course_enrolled->data.session1 || pc_course_enrolled->data.session2 == course_enrolled->data.session2)
+			return false;
+		pc_course_enrolled = pc_course_enrolled->course_next;
+	}
+	return true;
+}
+void enroll_course(Node_student * student_login, Node_year* current_year)
+{
+	print_semester(current_year->ph_semester);
+	int no_semester;
+	cout << "Choose a semester: "; cin >> no_semester;
+	Node_semester* semester_choose = find_semester(current_year->ph_semester, to_string(no_semester));
+	int no_course;
+	do
+	{
+		print_course(semester_choose->ph_course);
+		cout << "Choose a course: "; cin >> no_course;
+		Node_course* course_choose = find_course(semester_choose->ph_course, no_course);
+		if (check_course_sessions(course_choose, student_login->ph_course_enrolled))
+		{
+			cout << "Enrolling succeeded!\n";
+			add_enrolled_course(student_login->ph_course_enrolled, course_choose);
+			add_enrolled_student(course_choose->ph_student_enrolled, student_login);
+		}
+		else cout << "Your chosen course has conflicting sessions with your enrolled courses!\n";
+	} while (no_course != 0);
+
+}
+void menu_for_teacher(Node_year* &ph_year, Node_year* &current_year)
+{
 	string year_name;
 	int choice;
 	//giao diện menu
 	do {
-		cout << "1.Create year" << endl << "2.Show years" << endl << "3.Choose Year" << endl << "Your option: "; cin >> choice;
+		cout << "1.Create year\n" << "2.Show years\n" << "3.Choose Year\n" << "0.Quit\n" << "Your option: "; cin >> choice;
 		if (choice == 1)
 		{
 			do
 			{
-				cout << "Type year name(Ex: 2021-2020): ";
+				cout << "Type year name(Ex: 2021-2022): ";
 				cin >> year_name;
 				if (check_year_name_appropriate(year_name))
 					cout << "Accepted!\n";
 				else cout << "Not Accepted!\n";
 			} while (check_year_name_appropriate(year_name) != 1);
 			cout << "Have been create: " << year_name << endl;
-			add_year(ph_year, year_name);
+			add_year(ph_year, year_name, current_year);
 
 		}
 		if (choice == 2)
@@ -414,29 +535,29 @@ int main()
 		{
 			print_year(ph_year);
 			int year_no;
-			int semester_num = 1;
 			Node_year* year_choose;
-			do 
+			do
 			{
 				cout << "Choose year to add more information: "; cin >> year_no;
 				year_choose = find_year(ph_year, year_no);
 				if (year_choose == NULL)
 					cout << "Year not exists or not found!\n";
 			} while (year_choose == NULL);
-			
+
 			int choices;
+			/////////////////////////////////////////////////////////
 			do
 			{
-				cout << "1.Create class" << endl << "2.Delete class" << endl << "3.Add Students" << endl << "4.Add Semester" <<endl << "5.Delete Semester" << endl << "6.Add Course" << endl << "7.Delete Course\n";
+				cout << "1.Create class\n" << "2.Delete class\n" << "3.Add Students\n" << "4.Add Semester\n" << "5.Delete Semester\n" << "6.Add Course\n" << "7.Delete Course\n" << "0.Quit\n";
 				cin >> choices;
 				//Create class
-				if (choices == 1 )
+				if (choices == 1)
 				{
 
 					add_class(year_choose->ph_classes);
 				}
 				//Delete class
-				if (choices == 2 )
+				if (choices == 2)
 				{
 					if (year_choose->ph_classes != NULL)
 					{
@@ -464,21 +585,23 @@ int main()
 					{
 						cout << "Choose class to add students form file.csv: "; cin >> class_no;
 						class_choose = find_class(year_choose->ph_classes, class_no);
-						if(class_choose == NULL)
+						if (class_choose == NULL)
 							cout << "Class not exists or not found!\n";
 					} while (class_choose == NULL);
-					
+
 					add_1st_student(class_choose->ph_student, class_choose->name, year_choose->name);
 				}
 				//Add semester
 				if (choices == 4)
 				{
-					add_semester(year_choose->ph_semester, semester_num++);
+					if (year_choose->ph_semester == NULL)
+						add_semester(year_choose->ph_semester);
+					else cout << "Courses have been created\n";
 				}
 				//Delete semester
 				if (choices == 5)
 				{
-
+					print_semester(year_choose->ph_semester);
 				}
 				//Add course
 				if (choices == 6)
@@ -493,7 +616,7 @@ int main()
 						if (semester_choose == NULL)
 							cout << "Semester not exists or not found!\n";
 					} while (semester_choose == NULL);
-					
+
 					add_course(semester_choose->ph_course);
 				}
 				//Delete course
@@ -526,11 +649,102 @@ int main()
 					}
 					else cout << "There is no any course to delete\n";
 				}
-			} while (choice != 0);
+			} while (choices != 0);
 
 		}
 
 	} while (choice != 0);
+}
+void menu_for_student(long a, Node_year* ph_year, Node_year* current_year)
+{
+	Node_student* student_login = find_node_student_for_login_account(a, ph_year);
+	if (student_login == NULL)
+	{
+		cout << "Can not find your data!\nPlease contact for supporting\n";
+		return;
+	}
+	else
+		cout << "Loading your profile completed!\n";
+	int choice;
+	do
+	{
+		cout << "1.Enroll course\n" << "2.View a list of enrolled courses\n" << "0.Quit\n" << "Your option:"; 
+		cin >> choice;
+		if (choice == 1)
+		{
+			enroll_course(student_login, current_year);
+		}
+	} while (choice != 0);
+	
+}
+bool login(long &a) {
+	fstream fs; string s;
+	cout << "Enter MSSV: "; cin >> a;
+	cout << "Enter Password: "; cin >> s;
+	string b = to_string(a);
+	int cnt = 1;
+	bool acp = false;
+	bool end = true;
+	string chatluong[8] = { "NULL","NULL","NULL","NULL","NULL","APCS","VP","CLC" };
+	while (end) {
+		fs.open("StudentData\\" + to_string(a / 1000000) + "\\" + to_string(a / 1000000) + chatluong[(a / 1000) % 10] + to_string(cnt) + ".csv", ios::in);
+		if (!fs.is_open()) end = false;
+		else while (!fs.eof()) {
+			fs.ignore();
+			fs.ignore();
+			string check;
+			getline(fs, check, ',');
+			if (check == b) {
+				string pass;
+				int dem = 5;
+				while (dem--) {
+					getline(fs, pass, ',');
+				}
+				getline(fs, pass);
+				if (pass == s) {
+					end = false;
+					acp = true;
+				}
+			}
+			else {
+				getline(fs, check);
+			}
+			if (acp) break;
+		}
+		fs.close();
+		cnt++;
+	}
+	if (acp)
+	{
+		cout << "Login succeeded as student!\n";
+		return 1;
+	}
+	else
+	{
+		cout << "Failed login!\n";
+		return 0;
+	}
+
+}
+int main()
+{
+	Node_year* ph_year = NULL;
+	Node_year* current_year= NULL;
+	int choice;
+	do
+	{ 
+		cout << "1.Login\n" <<"2.Giao vu\n" << "0.Quit\n" << "Your option: ";
+		cin >> choice;
+		if (choice == 1)
+		{
+			long a;
+			if (login(a))
+			menu_for_student(a, ph_year, current_year);
+		}
+		if(choice == 2)
+			menu_for_teacher(ph_year, current_year);
+	} while (choice != 0);
+	
 	deallocate_all_node(ph_year);
 	return 0;
 }
