@@ -8,7 +8,8 @@ struct Node_student;
 struct COURSE_DATA
 {
 	//course id, course name, teacher name, number of credits, the maximum number of students in the course(default 50), day of the week, and the session that the course will be performed(MON / TUE / WED / THU / FRI / SAT, S1(07:30), S2(09:30), S3(13:30) and S4(15:30)).A course will be taught in 2 sessions in a week
-	string id, course_name, teacher_name, number_of_credits, max_num_student, days_of_week, session1, session2;
+	string id, course_name, teacher_name, session1, session2;
+	int number_of_credits, max_num_student,days_of_week;
 };
 struct Node_course
 {
@@ -87,7 +88,7 @@ void print_student(Node_student* ph_student)
 {
 	//in ra thông tin sinh viên vừa mới add vào
 	Node_student *pc_student = ph_student;
-	while (pc_student != NULL)
+	while (pc_student->student_next != NULL)
 	{
 		cout << pc_student->data.No << endl << pc_student->data.ID << endl << pc_student->data.first_name << endl << pc_student->data.lastname << endl << pc_student->data.gender << endl << pc_student->data.date << endl << pc_student->data.social_ID << endl;
 		pc_student = pc_student->student_next;
@@ -101,6 +102,22 @@ void print_course(Node_course* ph_course)
 	{
 		cout << i++ << ":" << pc->data.course_name << endl;
 		pc = pc->course_next;
+	}
+}
+void print_enrolled_course(Node_student* student_login)
+{
+	int count = 1;
+	if (student_login->ph_course_enrolled == NULL)
+	{
+		cout << "Haven't enrolled any course!\n";
+		return;
+	}
+
+	Node_course* pc_enrolled_coure = student_login->ph_course_enrolled;
+	while (pc_enrolled_coure != NULL)
+	{
+		cout << count++ << pc_enrolled_coure->data.course_name << endl;
+		pc_enrolled_coure = pc_enrolled_coure->course_next;
 	}
 }
 Node_year* find_year(Node_year* ph_year, int year_no)
@@ -276,12 +293,12 @@ void add_course(Node_course*& ph_course)
 {
 	//course id, course name, teacher name, number of credits, the maximum number of students in the course(default 50), day of the week, and the session that the course will be performed(MON / TUE / WED / THU / FRI / SAT, S1(07:30), S2(09:30), S3(13:30) and S4(15:30)).A course will be taught in 2 sessions in a week
 	COURSE_DATA DATA;
-	/*cout << "Course ID: "; cin >> DATA.id;
-	cout << "Course Name: "; cin >> DATA.course_name;
-	cout << "Teacher Name: "; cin >> DATA.teacher_name;
+	cout << "Course ID: "; cin >> DATA.id;cin.ignore();
+	cout << "Course Name: "; getline(cin,DATA.course_name);
+	cout << "Teacher Name: "; getline(cin,DATA.teacher_name);
 	cout << "Number of Credits: "; cin >> DATA.number_of_credits;
 	cout << "The maximum number of students in the course(default 50): "; cin >> DATA.max_num_student;
-	cout << "Day of the week: "; cin >> DATA.days_of_week;*/
+	cout << "Day of the week: "; cin >> DATA.days_of_week;
 	cout << "          MON / TUE / WED / THU / FRI / SAT\n" << "S1(07:30)\n" << "S2(09:30)\n" << "S3(13:30)\n" << "S4(15:30)\n";
 	cout << "The session that the course will be performed(Choose 2 session in a week)(Ex: MON_S2)\n" << "Session 1: "; 
 	cin >> DATA.session1;
@@ -353,6 +370,7 @@ void deallocate_course(Node_course*& ph_course)
 		ph_course = pc_course;
 	}
 }
+void deleteEnrolledCourse (Node_student *&student, int x);
 // hàm xóa Node_student
 void deallocate_student(Node_student*& ph_student)
 {
@@ -668,26 +686,41 @@ void menu_for_student(long a, Node_year* ph_year, Node_year* current_year)
 	int choice;
 	do
 	{
-		cout << "1.Enroll course\n" << "2.View a list of enrolled courses\n" << "0.Quit\n" << "Your option:"; 
+		cout << "1.Enroll course\n" << "2.View a list of enrolled courses\n" <<"3.Delete an enrolled course\n"<< "0.Quit\n" << "Your option:"; 
 		cin >> choice;
 		if (choice == 1)
 		{
 			enroll_course(student_login, current_year);
 		}
+		else if (choice == 2){
+			print_enrolled_course (student_login);
+		}
+		else{
+			cout<<"Choose a course to delete: "<<endl;
+			int x;
+			cin>>x;
+			deleteEnrolledCourse (student_login,x);
+		}
 	} while (choice != 0);
 	
 }
-bool login(long &a) {
+bool login(long a) {
 	fstream fs; string s;
-	cout << "Enter MSSV: "; cin >> a;
 	cout << "Enter Password: "; cin >> s;
 	string b = to_string(a);
 	int cnt = 1;
 	bool acp = false;
 	bool end = true;
-	string chatluong[8] = { "NULL","NULL","NULL","NULL","NULL","APCS","VP","CLC" };
+//	string *chatluong = { "NULL","NULL","NULL","NULL","NULL","APCS","VP","CLC" };
+	string *chatLuong = new string[8];
+	for (int i=0;i<=4;i++){
+		chatLuong[i] = "NULL";
+	}
+	chatLuong[5] = "APCS";
+	chatLuong[6] = "VP";
+	chatLuong[7] = "CLC";
 	while (end) {
-		fs.open("StudentData\\" + to_string(a / 1000000) + "\\" + to_string(a / 1000000) + chatluong[(a / 1000) % 10] + to_string(cnt) + ".csv", ios::in);
+		fs.open("StudentData/" + to_string(a / 1000000) + "/" + to_string(a / 1000000) + chatLuong[(a / 1000) % 10] + to_string(cnt) + ".csv", ios::in);
 		if (!fs.is_open()) end = false;
 		else while (!fs.eof()) {
 			fs.ignore();
@@ -714,6 +747,7 @@ bool login(long &a) {
 		fs.close();
 		cnt++;
 	}
+	delete[] chatLuong;
 	if (acp)
 	{
 		cout << "Login succeeded as student!\n";
@@ -724,7 +758,33 @@ bool login(long &a) {
 		cout << "Failed login!\n";
 		return 0;
 	}
-
+}
+void deleteEnrolledCourse (Node_student *&student, int x){
+	if (student->ph_course_enrolled->course_next == nullptr){
+		delete student->ph_course_enrolled;
+		student->ph_course_enrolled = nullptr;
+		return;
+	}
+	int cnt = 1;
+	Node_course *cur = student->ph_course_enrolled;
+	while (cnt!=(x-1)){
+		cur = cur->course_next;
+	}
+	if (x==1){
+		Node_course *del = cur;
+		cur = cur->course_next;
+		delete del;
+	}
+	else if (cur->course_next->course_next){
+		Node_course *del = cur->course_next;
+		cur->course_next = cur->course_next->course_next;
+		delete del;		
+	}
+	else{
+		Node_course *del = cur->course_next;
+		cur->course_next = nullptr;
+		delete del;
+	}
 }
 int main()
 {
@@ -738,6 +798,8 @@ int main()
 		if (choice == 1)
 		{
 			long a;
+			cout<<"Nhap MSSV: ";
+			cin>>a;
 			if (login(a))
 			menu_for_student(a, ph_year, current_year);
 		}
