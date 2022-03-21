@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <cstring>
@@ -13,6 +13,10 @@ struct COURSE_DATA
 };
 struct Node_course
 {
+	double final = 0;
+	double midterm = 0;
+	double total = 0;
+	double other = 0;
 	COURSE_DATA data;
 	Node_course* course_next;
 	Node_student* ph_student_enrolled;
@@ -46,6 +50,7 @@ struct Node_class
 //Node năm học
 struct Node_year
 {
+	int s_cur = 1;
 	string name;
 	Node_year* year_next;
 	Node_class* ph_classes;
@@ -367,7 +372,6 @@ void add_semester(Node_semester*& ph_semester)
 			pc_semester->semester_next = tmp;
 		}
 	}
-
 }
 void add_course(Node_course*& ph_course, string semester_no, string year_name)
 {
@@ -417,7 +421,6 @@ void add_course(Node_course*& ph_course, string semester_no, string year_name)
 		cout << "          MON / TUE / WED / THU / FRI / SAT\n" << "S1(07:30)\n" << "S2(09:30)\n" << "S3(13:30)\n" << "S4(15:30)\n";
 		cout << "The session that the course will be performed(Choose 2 session in a week)(Ex: MON_S2)\n" << "Session 1: ";
 		cin >> DATA.session1;
-
 		do
 		{
 			cout << "Session 2: "; cin >> DATA.session2;
@@ -433,7 +436,6 @@ void add_course(Node_course*& ph_course, string semester_no, string year_name)
 			pc_course = pc_course->course_next;
 		pc_course->course_next = tmp;
 	}
-	
 }
 void add_enrolled_course(Node_course*& ph_course_enrolled, Node_course* enrolled_course)
 {
