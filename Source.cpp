@@ -111,7 +111,6 @@ void print_course(Node_course* ph_course)
 }
 void print_enrolled_course(Node_student* student_login)
 {
-	
 	int count = 1;
 	if (student_login->ph_course_enrolled1 == NULL && student_login->ph_course_enrolled2 == NULL && student_login->ph_course_enrolled3 == NULL)
 	{
@@ -375,11 +374,12 @@ void add_semester(Node_semester*& ph_semester)
 }
 void add_course(Node_course*& ph_course, string semester_no, string year_name)
 {
+	fstream fs;
+	fs.open("CoursesData\\" + semester_no + "\\" + "Courses.txt");
 	if (ph_course == nullptr)
 	{
 		year_name = to_string(year_name[2] - 48) + to_string(year_name[3] - 48);
 		fstream read("StudentData\\" + year_name + "\\" + semester_no +".txt", ios::in);
-		
 		while (!read.eof())
 		{
 			COURSE_DATA DATA;
@@ -391,6 +391,7 @@ void add_course(Node_course*& ph_course, string semester_no, string year_name)
 			read >> DATA.days_of_week;
 			read >> DATA.session1;
 			read >> DATA.session2;
+			fs << DATA.course_name << endl;
 			Node_course* tmp = new Node_course;
 			tmp->data = DATA;
 			tmp->course_next = NULL;
@@ -404,7 +405,7 @@ void add_course(Node_course*& ph_course, string semester_no, string year_name)
 			{
 				while (pc_course->course_next != NULL)
 					pc_course = pc_course->course_next;
-				pc_course->course_next = tmp;
+					pc_course->course_next = tmp;
 			}
 		}
 		read.close();
@@ -414,6 +415,7 @@ void add_course(Node_course*& ph_course, string semester_no, string year_name)
 		COURSE_DATA DATA;
 		cout << "Course ID: "; cin >> DATA.id; cin.ignore();
 		cout << "Course Name: "; getline(cin, DATA.course_name);
+		fs << DATA.course_name << endl;		
 		cout << "Teacher Name: "; getline(cin, DATA.teacher_name);
 		cout << "Number of Credits: "; cin >> DATA.number_of_credits;
 		cout << "The maximum number of students in the course(default 50): "; cin >> DATA.max_num_student;
@@ -436,6 +438,7 @@ void add_course(Node_course*& ph_course, string semester_no, string year_name)
 			pc_course = pc_course->course_next;
 		pc_course->course_next = tmp;
 	}
+	fs.close();
 }
 void add_enrolled_course(Node_course*& ph_course_enrolled, Node_course* enrolled_course)
 {
@@ -970,6 +973,47 @@ bool login(long a) {
 		return 0;
 	}
 }
+//void printExistedCourses(fstream &fs){
+//	fs.open("CoursesData\\Semester 1\\Courses.txt");
+//	while (!fs.eof()){
+//		string s;
+//		fs>>s;
+//		cout<<s<<endl;
+//	}
+//	fs.close();
+//}
+void updateStudentResult(Node_student *&a, Node_year *b,string s, double x, double y, double z, double t,){
+	if (b->s_cur == 1){
+		Node_course *cur = a->ph_course_enrolled1;
+		while (cur->data->course_name != s){
+			cur = cur->course_next->next;
+		}
+		cur->total = x;
+		cur->final = y;
+		cur->midterm = z;
+		cur->other = t;
+	}
+	if (b->s_cur == 2){
+		Node_course *cur = a->ph_course_enrolled2;
+		while (cur->data->course_name != s){
+			cur = cur->course_next->next;
+		}
+		cur->total = x;
+		cur->final = y;
+		cur->midterm = z;
+		cur->other = t;
+	}
+	if (b->s_cur == 3){
+		Node_course *cur = a->ph_course_enrolled3;
+		while (cur->data->course_name != s){
+			cur = cur->course_next->next;
+		}
+		cur->total = x;
+		cur->final = y;
+		cur->midterm = z;
+		cur->other = t;
+	}		
+}
 int main()
 {
 	Node_year* ph_year = NULL;
@@ -992,5 +1036,7 @@ int main()
 	} while (choice != 0);
 
 	deallocate_all_node(ph_year);
+//	fstream fs;
+//	printExistedCourses(fs);
 	return 0;
 }
