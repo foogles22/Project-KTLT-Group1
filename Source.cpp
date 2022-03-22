@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include <Windows.h>
+#include <windows.h>
 #include <ctime>
 #include <fstream>
 #include <conio.h>
@@ -33,11 +33,9 @@ void clrs()
 	Position.Y = 1;
 	SetConsoleCursorPosition(hOut, Position);
 }
-void print_Login()
+void print_Login_logo(int x1, int y1)
 {
 	textColor(11);
-	int x1 = 65, y1 = 4;
-
 	gotoXY(x1, ++y1);
 					cout << " .----------------.  .----------------.  .----------------.  .----------------.  .----------------.";
 	gotoXY(x1, ++y1);
@@ -49,7 +47,7 @@ void print_Login()
 	gotoXY(x1, ++y1);
 					cout << "| |    | |       | || |  /  .--.  \\  | || | / .'   \\_|   | || |      | |     | || |  |   \\ | |   | |";
 	gotoXY(x1, ++y1);
-					cout << "| |    | |   _   | || |  | |    | |  | || | | |    ____  | || |      | |     | || |  | |\\ \\| |   | |";
+					cout << "| |    | |   _   | || |  | |    | |  | || || |     ____  | || |      | |     | || |  | |\\ \\| |   | |";
 	gotoXY(x1, ++y1);
 					cout << "| |   _| |__/ |  | || |  \\  `--'  /  | || | \\ `.___]  _| | || |     _| |_    | || | _| |_\\   |_  | |";
 	gotoXY(x1, ++y1);
@@ -60,13 +58,13 @@ void print_Login()
 					cout << "| '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |";
 	gotoXY(x1, ++y1);
 					cout << " '----------------'  '----------------'  '----------------'  '----------------'  '----------------'";
-
 	textColor(15);
+
 }
-void print_Viennen(int lenght, int width)
+void print_Viennen(int length, int width)
 {
 	//Tren cung
-	for (int x = 2; x < lenght; x++)
+	for (int x = 2; x < length; x++)
 	{
 		gotoXY(x, 1);
 		cout << char(220);
@@ -74,7 +72,7 @@ void print_Viennen(int lenght, int width)
 	//Ben phai
 	for (int y = 2; y <= width; y++)
 	{
-		gotoXY(lenght - 1, y);
+		gotoXY(length - 1, y);
 		cout << char(219);
 	}
 	//Ben trai
@@ -84,59 +82,197 @@ void print_Viennen(int lenght, int width)
 		cout << char(219);
 	}
 	//Duoi cung
-	for (int x = 2; x < lenght; x++)
+	for (int x = 2; x < length; x++)
 	{
 		gotoXY(x, width);
 		cout << char(223);
 	}
 }
-void print_menu(int choose)
+void print__fill_square(int x1, int y1, int length, int width, bool led, int color)
 {
-	int x = 110, y = 27;
-	for (int i = 0; i < 6; i++) {
-		if (choose == i) textColor(12);
-		gotoXY(x, ++y);
-		cout << char(201) << char(205) << char(205) << char(205) << char(205) << char(205) << char(205) << char(205) << char(205) << char(205) << char(187);
-		gotoXY(x, ++y);
-		cout << char(186);
-		if (choose == i)	textColor(15);
-		if (i == 0)cout << "  START  ";
-		if (i == 1)cout << "  LOGIN  ";
-		if (i == 2)cout << "LOAD SAVE";
-		if (i == 3)cout << "  GUIDE  ";
-		if (i == 4) cout << "  SCORE  ";
-		if (i == 5) cout << "  QUIT!  ";
-		if (choose == i)	textColor(12);
-		cout << char(186);
-		gotoXY(x, ++y);
-		cout << char(200) << char(205) << char(205) << char(205) << char(205) << char(205) << char(205) << char(205) << char(205) << char(205) << char(188);
-		if (choose == i)	textColor(15);
+	textColor(color);
+	//Tren cung
+	for (int x = x1; x < x1 + length; x++)
+	{
+		gotoXY(x, y1-1);
+		cout << char(220);
 	}
+	//Ben phai
+	for (int y = y1; y <= y1 + width; y++)
+	{
+		gotoXY(x1 + length - 1, y);
+		cout << char(219);
+	}
+	//Ben trai
+	for (int y = y1; y <= y1 + width; y++)
+	{
+		gotoXY(x1, y);
+		cout << char(219);
+	}
+	//Duoi cung
+	for (int x = x1; x < x1 + length; x++)
+	{
+		gotoXY(x, y1 + width);
+		cout << char(223);
+	}
+	textColor(15);
+}
+void print__double_square(int x1, int y1, int length, int width, bool led, int color)
+{
+	textColor(color);
+	//Tren cung
+	for (int x = x1; x < x1 + length; x++)
+	{
+		gotoXY(x, y1 - 1);
+		if (x == x1)
+			cout << char(201);
+		if (x == x1 + length - 1)
+			cout << char(187);
+		else
+			cout << char(205);
+	}
+	//Ben phai
+	for (int y = y1; y <= y1 + width; y++)
+	{
+		gotoXY(x1 + length - 1, y);
+		cout << char(186);
+	}
+	//Ben trai
+	for (int y = y1; y <= y1 + width; y++)
+	{
+		gotoXY(x1, y);
+		cout << char(186);
+	}
+	//Duoi cung
+	for (int x = x1; x < x1 + length; x++)
+	{
+		gotoXY(x, y1 + width);
+		if (x == x1)
+			cout << char(200);
+		if (x == x1 + length - 1)
+			cout << char(188);
+		else
+			cout << char(205);
+	}
+	textColor(15);
+}
+void text(int x, int y, string text, bool led, int color)
+{
+	if(led) textColor(color);
+	gotoXY(x, y);
+	cout << text;
+	if(led) textColor(15);
+}
+void print_username_password(int choose)
+{
+	//x,y,length,width,led,color (square)
+	//x,y,text,led,color (text)
+	if (choose == 1)
+		print__double_square(66, 26, 40, 3, 0, 12);	
+	else
+		print__double_square(66, 26, 40, 3, 0, 15);
+		text(67, 27, "USERNAME: ", 1, 15);
+	
+	if (choose == 2)
+		print__double_square(66, 31, 40, 3, 0, 12);
+	else 
+		print__double_square(66, 31, 40, 3, 0, 15);
+		text(67, 32, "PASSWORD: ", 1, 15);
+
+	if (choose == 3)
+		print__double_square(78, 36, 17, 1, 0, 12);
+	else
+		print__double_square(78, 36, 17, 1, 0, 15);
+		text(84, 36, "Login", 1, 15);
+
+	if (choose == 4)
+		print__double_square(78, 39, 17, 1, 0, 12);
+	else
+		print__double_square(78, 39, 17, 1, 0, 15);
+	text(84, 39, "Exit!", 1, 15);
+}
+void print_login_status(int x1, int y1, bool succeed)
+{
+	if (succeed)
+	{
+			gotoXY(x1, ++y1);
+			cout << "	 _                 _                                         _          _ ";
+			gotoXY(x1, ++y1);
+			cout << "	| |               (_)                                       | |        | |";
+			gotoXY(x1, ++y1);
+			cout << "	| |     ___   __ _ _ _ __    ___ _   _  ___ ___ ___  ___  __| | ___  __| |";
+			gotoXY(x1, ++y1);
+			cout << "	| |    / _ \\ / _` | | '_ \\  / __| | | |/ __/ __/ _ \\/ _ \\/ _` |/ _ \\/ _` |";
+			gotoXY(x1, ++y1);
+			cout << "	| |___| (_) | (_| | | | | | \\__ \\ |_| | (_| (_|  __/  __/ (_| |  __/ (_| |";
+			gotoXY(x1, ++y1);
+			cout << "	\\_____/\\___/ \\__, |_|_| |_| |___/\\__,_|\\___\\___\\___|\\___|\\__,_|\\___|\\__,_|";
+			gotoXY(x1, ++y1);
+			cout << "                     __/ |                                                ";
+			gotoXY(x1, ++y1);
+			cout << "                    |___/                                                 ";
+	}
+	else
+	{
+		x1 += 13;
+			gotoXY(x1, ++y1);
+			cout << "  _                 _          __      _ _          _ ";
+			gotoXY(x1, ++y1);
+			cout << " | |               (_)        / _|    (_) |        | |";
+			gotoXY(x1, ++y1);
+			cout << " | |     ___   __ _ _ _ __   | |_ __ _ _| | ___  __| |";
+			gotoXY(x1, ++y1);
+			cout << " | |    / _ \\ / _` | | '_ \\  |  _/ _` | | |/ _ \\/ _` |";
+			gotoXY(x1, ++y1);
+			cout << " | |___| (_) | (_| | | | | | | || (_| | | |  __/ (_| |";
+			gotoXY(x1, ++y1);
+			cout << " |______\\___/ \\__, |_|_| |_| |_| \\__,_|_|_|\\___|\\__,_|";
+			gotoXY(x1, ++y1);
+			cout << "               __/ |                                  ";
+			gotoXY(x1, ++y1);
+			cout << "              |___/                                   ";
+	}
+}
+void print_login_section()
+{
+	int choose = 1;	char move; string mssv, password;
+	bool one = true, two = true;
+	do {	
+		print_username_password(0);
+		do {
+			// 235, 63
+			print_Viennen(167, 51);
+			// 68, 4
+			print_Login_logo(35,2);
+			move = _getch();
+			if (move == 'w' || move == 72)
+				if (choose > 1)
+					choose--;
+			if (move == 's' || move == 80)
+				if (choose < 4)
+					choose++;
+			print_username_password(choose);
+		} while (move != 13);
+		if (choose == 1 && one)
+		{
+			gotoXY(77, 27);
+			cin >> mssv;
+			one = false;
+		}
+		if (choose == 2 && two)
+		{
+			gotoXY(77, 32);
+			cin >> password;
+			two = false;
+		}
+		if (choose == 3)
+		{
+			print_login_status(46, 15,0);
+			one = true; two = true;
+		}
+	} while (choose != 4);
 }
 int main()
 {
-	/*int choose = 0;	char move;
-	do {
-
-		system("CLS");
-		do {
-			print_Login();
-			print_menu(choose);
-			move = _getch();
-
-			if (move == 'w' || move == 72)
-				if (choose > 0)
-					choose--;
-			if (move == 's' || move == 80)
-				if (choose < 5)
-					choose++;
-
-			print_menu(choose);
-
-		} while (move != 13);
-
-	} while (choose != 5);*/
-	print_Viennen(235, 63);
-	print_Login();
-	_getch();
+	print_login_section();
 }
