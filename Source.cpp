@@ -63,7 +63,33 @@ void print_Login()
 
 	textColor(15);
 }
-
+void print_Viennen(int lenght, int width)
+{
+	//Tren cung
+	for (int x = 2; x < lenght; x++)
+	{
+		gotoXY(x, 1);
+		cout << char(220);
+	}
+	//Ben phai
+	for (int y = 2; y <= width; y++)
+	{
+		gotoXY(lenght - 1, y);
+		cout << char(219);
+	}
+	//Ben trai
+	for (int y = 2; y <= width; y++)
+	{
+		gotoXY(2, y);
+		cout << char(219);
+	}
+	//Duoi cung
+	for (int x = 2; x < lenght; x++)
+	{
+		gotoXY(x, width);
+		cout << char(223);
+	}
+}
 void print_menu(int choose)
 {
 	int x = 110, y = 27;
@@ -110,7 +136,7 @@ int main()
 		} while (move != 13);
 
 	} while (choose != 5);*/
-
+	print_Viennen(235, 63);
 	print_Login();
 	_getch();
 }
