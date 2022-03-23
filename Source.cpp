@@ -983,6 +983,7 @@ bool login(long a) {
 //	fs.close();
 //}
 void updateStudentResult(Node_student *&a, Node_year *b,string s, double x, double y, double z, double t,){
+	//use while loop to get each  student ID then use the find_student by id to make changes
 	if (b->s_cur == 1){
 		Node_course *cur = a->ph_course_enrolled1;
 		while (cur->data->course_name != s){
@@ -1013,6 +1014,49 @@ void updateStudentResult(Node_student *&a, Node_year *b,string s, double x, doub
 		cur->midterm = z;
 		cur->other = t;
 	}		
+}
+void viewScoreBoardOfACourse(Node_year *a;){
+	fstream fs;
+	fs.open("CoursesData\\Semester " + to_string(a->s_cur) +"\\Courses.txt");
+	while (!fs.eof()){
+		string s;
+		fs>>s;
+		cout<<s<<endl;
+	}
+	cout<<"Which course do you want to view? ";
+	string b;
+	cin>>b;
+	fstream fs1;
+	fs1.open("CoursesData\\Semester " + to_string(a->s_cur) +"\\" + b +".csv");
+	while(!fs1.eof()){
+		string c;
+		getline(fs,c);
+		cout<<c<<endl;
+	}
+	fs1.close();
+	fs.close();
+} //view scoreboard
+void viewScoreBoardByStudent (Node_student *a, Node_year *b){
+	// use find_node_student_for_login_account function to Node student a
+	if (b.s_cur == 1){
+		Node_course *view = a->ph_course_enrolled1
+		Node_course *cur = a->ph_course_enrolled1;
+		while (cur){
+			cout<<cur->data->course_name<<endl;
+			cur = cur->course_next;
+		}
+		cout<<"Which course to view?";
+		string s;
+		cin>>s;
+		while (view->data->course_name!=s){
+			view = view->course_next;
+		}
+		cout<<view->final<<endl;
+		cout<<view->midterm<<endl;
+		cout<<view->other<<endl;
+		cout<<view->total;
+	}
+	
 }
 int main()
 {
