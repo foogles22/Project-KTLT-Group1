@@ -1056,7 +1056,59 @@ void viewScoreBoardByStudent (Node_student *a, Node_year *b){
 		cout<<view->other<<endl;
 		cout<<view->total;
 	}
-	
+}
+void viewScoreBoardOfAClass (Node_class *a, Node_year *b){
+	Node_student *curStudent = a->ph_student;
+	double totalGPA = 0;
+	int countStudent = 0;
+	while (curStudent){
+		countStudent+=1;
+		cout<<curStudent->data->first_name<<" ";
+		if (b->s_cur == 1){
+			Node_course *curEnrolled = curStudent->ph_course_enrolled1;
+			double gpaCourse = 0;
+			int cnt = 0;
+			while (curEnrolled){
+				cnt+=1;
+				gpaCourse += curEnrolled->final;
+				cout<<curEnrolled->data->course_name<<":";
+				cout<<curEnrolled->final<<" ";
+				curEnrolled = curEnrolled->course_next;
+			}
+			cout<<"GPA:"<<(double)gpaCourse/cnt<<endl;
+			totalGPA += gpaCourse;
+		}
+		if (b->s_cur == 2){
+			Node_course *curEnrolled = curStudent->ph_course_enrolled2;
+			double gpaCourse = 0;
+			int cnt = 0;
+			while (curEnrolled){
+				cnt+=1;
+				gpaCourse += curEnrolled->final;
+				cout<<curEnrolled->data->course_name<<":";
+				cout<<curEnrolled->final<<" ";
+				curEnrolled = curEnrolled->course_next;
+			}
+			cout<<"GPA:"<<(double)gpaCourse/cnt<<endl;
+			totalGPA += gpaCourse;			
+		}
+		if (b->s_cur == 3){
+			Node_course *curEnrolled = curStudent->ph_course_enrolled3;
+			double gpaCourse = 0;
+			int cnt = 0;
+			while (curEnrolled){
+				cnt+=1;
+				gpaCourse += curEnrolled->final;
+				cout<<curEnrolled->data->course_name<<":";
+				cout<<curEnrolled->final<<" ";
+				curEnrolled = curEnrolled->course_next;
+			}
+			cout<<"GPA:"<<(double)gpaCourse/cnt<<endl;
+			totalGPA += gpaCourse;			
+		}				
+		curStudent = curStudent->student_next;
+	}
+	cout<<"Total GPA of this class: "<<(double)totalGPA/countStudent;
 }
 int main()
 {
