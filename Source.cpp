@@ -33,21 +33,21 @@ struct SINHVIEN
 {
 	string No, ID, first_name, lastname, gender, social_ID, password, date;
 };
-//Node sinh viên
+//Node sinh vi�n
 struct Node_student
 {
 	SINHVIEN data;
 	Node_student* student_next;
 	Node_course* ph_course_enrolled1, * ph_course_enrolled2, * ph_course_enrolled3;
 };
-//Node lớp học
+//Node l?p h?c
 struct Node_class
 {
 	string name;
 	Node_class* class_next;
 	Node_student* ph_student;
 };
-//Node năm học
+//Node nam h?c
 struct Node_year
 {
 	int s_cur = 1;
@@ -56,7 +56,7 @@ struct Node_year
 	Node_class* ph_classes;
 	Node_semester* ph_semester;
 };
-//Hàm để in ra các lớp học
+//H�m d? in ra c�c l?p h?c
 void print_class(Node_class* ph_class)
 {
 	Node_class* pc_class = ph_class;
@@ -67,7 +67,7 @@ void print_class(Node_class* ph_class)
 		pc_class = pc_class->class_next;
 	}
 }
-//Hàm để in ra các năm học
+//H�m d? in ra c�c nam h?c
 void print_year(Node_year* ph_year)
 {
 	Node_year* pc = ph_year;
@@ -78,7 +78,7 @@ void print_year(Node_year* ph_year)
 		pc = pc->year_next;
 	}
 }
-//Hàm để tìm Node năm học được chọn
+//H�m d? t�m Node nam h?c du?c ch?n
 void print_semester(Node_semester* ph_semester)
 {
 	Node_semester* pc = ph_semester;
@@ -91,7 +91,7 @@ void print_semester(Node_semester* ph_semester)
 }
 void print_student(Node_student* ph_student)
 {
-	//in ra thông tin sinh viên vừa mới add vào
+	//in ra th�ng tin sinh vi�n v?a m?i add v�o
 	Node_student* pc_student = ph_student;
 	while (pc_student->student_next != NULL)
 	{
@@ -202,7 +202,7 @@ Node_year* find_year(Node_year* ph_year, int year_no)
 		return pc_year;
 	else return NULL;
 }
-//Hàm để tìm Node lớp học được chọn
+//H�m d? t�m Node l?p h?c du?c ch?n
 Node_class* find_class(Node_class* ph_class, int class_no)
 {
 	if (ph_class == NULL)
@@ -244,7 +244,7 @@ Node_year* find_year_by_name(Node_year* ph_year, string year_name)
 		pc_year = pc_year->year_next;
 	return pc_year;
 }
-//Hàm để tìm Node lớp học được chọn
+//H�m d? t�m Node l?p h?c du?c ch?n
 Node_class* find_class_by_name(Node_class* ph_class, string class_name)
 {
 	Node_class* pc_class = ph_class;
@@ -259,7 +259,7 @@ Node_student* find_student_by_id(Node_student* ph_student, string id)
 		pc_student = pc_student->student_next;
 	return pc_student;
 }
-//Hàm để thêm năm học vào
+//H�m d? th�m nam h?c v�o
 void add_year(Node_year*& ph_year, string year_name, Node_year*& current_year)
 {
 	Node_year* tmp = new Node_year;
@@ -280,7 +280,7 @@ void add_year(Node_year*& ph_year, string year_name, Node_year*& current_year)
 		pc->year_next = tmp;
 	}
 }
-//Hàm để thêm lớp học vào 
+//H�m d? th�m l?p h?c v�o 
 void add_class(Node_class*& ph_class)
 {
 	string class_name;
@@ -302,7 +302,7 @@ void add_class(Node_class*& ph_class)
 		pc_class->class_next = tmp;
 	}
 }
-//Hàm để thêm hồ sơ các sinh viên năm nhất vào
+//H�m d? th�m h? so c�c sinh vi�n nam nh?t v�o
 void add_1st_student(Node_student*& ph_student, string class_name, string year_name)
 {
 	year_name = to_string(year_name[2] - 48) + to_string(year_name[3] - 48);
@@ -539,7 +539,7 @@ void deleteEnrolledCourse(Node_student*& student) {
 		delete del;
 	}
 }
-// hàm xóa Node_student
+// h�m x�a Node_student
 void deallocate_student(Node_student*& ph_student)
 {
 	while (ph_student != NULL)
@@ -549,7 +549,7 @@ void deallocate_student(Node_student*& ph_student)
 		ph_student = pc_student;
 	}
 }
-// hàm xóa Node_class
+// h�m x�a Node_class
 void deallocate_class(Node_class*& ph_class)
 {
 	while (ph_class != NULL)
@@ -560,7 +560,7 @@ void deallocate_class(Node_class*& ph_class)
 		ph_class = pc_class;
 	}
 }
-// hàm xóa mọi Node
+// h�m x�a m?i Node
 void deallocate_all_node(Node_year* ph_year)
 {
 	while (ph_year != NULL)
@@ -720,7 +720,7 @@ void enroll_course(Node_student* student_login, Node_year* current_year)
 			cout << "Choose a course: "; cin >> no_course;
 			Node_course* course_choose = find_course(semester_choose->ph_course, no_course);
 			if (check_not_over_max_student_in_a_course(course_choose->ph_student_enrolled, course_choose->data.max_num_student))
-				if (check_course_sessions(course_choose, *ph_course_enrolled))// check xem có bị trùng giờ học không?
+				if (check_course_sessions(course_choose, *ph_course_enrolled))// check xem c� b? tr�ng gi? h?c kh�ng?
 				{
 					cout << "Enrolling succeeded!\n";
 					add_enrolled_course(*ph_course_enrolled, course_choose);
@@ -742,7 +742,7 @@ void menu_for_teacher(Node_year*& ph_year, Node_year*& current_year)
 {
 	string year_name;
 	int choice;
-	//giao diện menu
+	//giao di?n menu
 	do {
 		cout << "1.Create year\n" << "2.Show years\n" << "3.Choose Year\n" << "0.Quit\n" << "Your option: "; cin >> choice;
 		if (choice == 1)
@@ -1136,3 +1136,4 @@ int main()
 //	printExistedCourses(fs);
 	return 0;
 }
+
