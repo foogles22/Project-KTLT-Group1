@@ -4,7 +4,6 @@
 #include <cstring>
 #include <time.h>
 using namespace std;
-struct Node_student;
 struct COURSE_DATA
 {
 	//course id, course name, teacher name, number of credits, the maximum number of students in the course(default 50), day of the week, and the session that the course will be performed(MON / TUE / WED / THU / FRI / SAT, S1(07:30), S2(09:30), S3(13:30) and S4(15:30)).A course will be taught in 2 sessions in a week
@@ -33,21 +32,21 @@ struct SINHVIEN
 {
 	string No, ID, first_name, lastname, gender, social_ID, password, date;
 };
-//Node sinh vi�n
+//Node sinh viên
 struct Node_student
 {
 	SINHVIEN data;
 	Node_student* student_next;
 	Node_course* ph_course_enrolled1, * ph_course_enrolled2, * ph_course_enrolled3;
 };
-//Node l?p h?c
+//Node lớp học
 struct Node_class
 {
 	string name;
 	Node_class* class_next;
 	Node_student* ph_student;
 };
-//Node nam h?c
+//Node năm học
 struct Node_year
 {
 	int s_cur = 1;
@@ -56,7 +55,8 @@ struct Node_year
 	Node_class* ph_classes;
 	Node_semester* ph_semester;
 };
-//H�m d? in ra c�c l?p h?c
+//Hàm để in ra các lớp học
+Node_student* find_node_student_for_login_account(long mssv, Node_year* ph_year);
 void print_class(Node_class* ph_class)
 {
 	Node_class* pc_class = ph_class;
@@ -67,7 +67,7 @@ void print_class(Node_class* ph_class)
 		pc_class = pc_class->class_next;
 	}
 }
-//H�m d? in ra c�c nam h?c
+//Hàm để in ra các năm học
 void print_year(Node_year* ph_year)
 {
 	Node_year* pc = ph_year;
@@ -78,7 +78,7 @@ void print_year(Node_year* ph_year)
 		pc = pc->year_next;
 	}
 }
-//H�m d? t�m Node nam h?c du?c ch?n
+//Hàm để tìm Node năm học được chọn
 void print_semester(Node_semester* ph_semester)
 {
 	Node_semester* pc = ph_semester;
@@ -91,7 +91,7 @@ void print_semester(Node_semester* ph_semester)
 }
 void print_student(Node_student* ph_student)
 {
-	//in ra th�ng tin sinh vi�n v?a m?i add v�o
+	//in ra thông tin sinh viên vừa mới add vào
 	Node_student* pc_student = ph_student;
 	while (pc_student->student_next != NULL)
 	{
@@ -202,7 +202,7 @@ Node_year* find_year(Node_year* ph_year, int year_no)
 		return pc_year;
 	else return NULL;
 }
-//H�m d? t�m Node l?p h?c du?c ch?n
+//Hàm để tìm Node lớp học được chọn
 Node_class* find_class(Node_class* ph_class, int class_no)
 {
 	if (ph_class == NULL)
@@ -244,7 +244,7 @@ Node_year* find_year_by_name(Node_year* ph_year, string year_name)
 		pc_year = pc_year->year_next;
 	return pc_year;
 }
-//H�m d? t�m Node l?p h?c du?c ch?n
+//Hàm để tìm Node lớp học được chọn
 Node_class* find_class_by_name(Node_class* ph_class, string class_name)
 {
 	Node_class* pc_class = ph_class;
@@ -259,7 +259,7 @@ Node_student* find_student_by_id(Node_student* ph_student, string id)
 		pc_student = pc_student->student_next;
 	return pc_student;
 }
-//H�m d? th�m nam h?c v�o
+//Hàm để thêm năm học vào
 void add_year(Node_year*& ph_year, string year_name, Node_year*& current_year)
 {
 	Node_year* tmp = new Node_year;
@@ -280,7 +280,7 @@ void add_year(Node_year*& ph_year, string year_name, Node_year*& current_year)
 		pc->year_next = tmp;
 	}
 }
-//H�m d? th�m l?p h?c v�o 
+//Hàm để thêm lớp học vào 
 void add_class(Node_class*& ph_class)
 {
 	string class_name;
@@ -302,7 +302,7 @@ void add_class(Node_class*& ph_class)
 		pc_class->class_next = tmp;
 	}
 }
-//H�m d? th�m h? so c�c sinh vi�n nam nh?t v�o
+//Hàm để thêm hồ sơ các sinh viên năm nhất vào
 void add_1st_student(Node_student*& ph_student, string class_name, string year_name)
 {
 	year_name = to_string(year_name[2] - 48) + to_string(year_name[3] - 48);
@@ -539,7 +539,7 @@ void deleteEnrolledCourse(Node_student*& student) {
 		delete del;
 	}
 }
-// h�m x�a Node_student
+// hàm xóa Node_student
 void deallocate_student(Node_student*& ph_student)
 {
 	while (ph_student != NULL)
@@ -549,7 +549,7 @@ void deallocate_student(Node_student*& ph_student)
 		ph_student = pc_student;
 	}
 }
-// h�m x�a Node_class
+// hàm xóa Node_class
 void deallocate_class(Node_class*& ph_class)
 {
 	while (ph_class != NULL)
@@ -560,7 +560,7 @@ void deallocate_class(Node_class*& ph_class)
 		ph_class = pc_class;
 	}
 }
-// h�m x�a m?i Node
+// hàm xóa mọi Node
 void deallocate_all_node(Node_year* ph_year)
 {
 	while (ph_year != NULL)
@@ -620,6 +620,209 @@ void delete_specific_course(Node_course*& ph_course, Node_course* pdel_course)
 	}
 	pc_course->course_next = pc_course->course_next->course_next;
 	delete pdel_course;
+}
+//void printExistedCourses(fstream &fs){
+//	fs.open("CoursesData\\Semester 1\\Courses.txt");
+//	while (!fs.eof()){
+//		string s;
+//		fs>>s;
+//		cout<<s<<endl;
+//	}
+//	fs.close();
+//}
+void updateStudentResult(Node_student *&a, Node_year *b,string s, double x, double y, double z, double t){
+	//use while loop to get each  student ID then use the find_student by id to make changes
+	if (b->s_cur == 1){
+		Node_course *cur = a->ph_course_enrolled1;
+		while (cur->data.course_name != s){
+			cur = cur->course_next;
+		}
+		cur->total = x;
+		cur->final = y;
+		cur->midterm = z;
+		cur->other = t;
+	}
+	if (b->s_cur == 2){
+		Node_course *cur = a->ph_course_enrolled2;
+		while (cur->data.course_name != s){
+			cur = cur->course_next;
+		}
+		cur->total = x;
+		cur->final = y;
+		cur->midterm = z;
+		cur->other = t;
+	}
+	if (b->s_cur == 3){
+		Node_course *cur = a->ph_course_enrolled3;
+		while (cur->data.course_name != s){
+			cur = cur->course_next;
+		}
+		cur->total = x;
+		cur->final = y;
+		cur->midterm = z;
+		cur->other = t;
+	}		
+}
+void viewScoreBoardOfACourse(Node_year *a){
+	fstream fs;
+	fs.open("CoursesData\\Semester " + to_string(a->s_cur) +"\\Courses.txt");
+	while (!fs.eof()){
+		string s;
+		fs>>s;
+		cout<<s<<endl;
+	}
+	cout<<"Which course do you want to view? ";
+	string b;
+	cin>>b;
+	fstream fs1;
+	fs1.open("CoursesData\\Semester " + to_string(a->s_cur) +"\\" + b +".csv");
+	while(!fs1.eof()){
+		string c;
+		getline(fs,c);
+		cout<<c<<endl;
+	}
+	fs1.close();
+	fs.close();
+} //view scoreboard
+void viewScoreBoardByStudent (Node_student *a, Node_year *b){
+	// use find_node_student_for_login_account function to Node student a
+	if (b->s_cur == 1){
+		Node_course *view = a->ph_course_enrolled1;
+		Node_course *cur = a->ph_course_enrolled1;
+		while (cur){
+			cout<<cur->data.course_name<<endl;
+			cur = cur->course_next;
+		}
+		cout<<"Which course to view?";
+		string s;
+		cin>>s;
+		while (view->data.course_name!=s){
+			view = view->course_next;
+		}
+		cout<<view->final<<endl;
+		cout<<view->midterm<<endl;
+		cout<<view->other<<endl;
+		cout<<view->total;
+	}
+	if (b->s_cur == 2){
+		Node_course *view = a->ph_course_enrolled2;
+		Node_course *cur = a->ph_course_enrolled2;
+		while (cur){
+			cout<<cur->data.course_name<<endl;
+			cur = cur->course_next;
+		}
+		cout<<"Which course to view?";
+		string s;
+		cin>>s;
+		while (view->data.course_name!=s){
+			view = view->course_next;
+		}
+		cout<<view->final<<endl;
+		cout<<view->midterm<<endl;
+		cout<<view->other<<endl;
+		cout<<view->total;
+	}
+	if (b->s_cur == 3){
+		Node_course *view = a->ph_course_enrolled3;
+		Node_course *cur = a->ph_course_enrolled3;
+		while (cur){
+			cout<<cur->data.course_name<<endl;
+			cur = cur->course_next;
+		}
+		cout<<"Which course to view?";
+		string s;
+		cin>>s;
+		while (view->data.course_name!=s){
+			view = view->course_next;
+		}
+		cout<<view->final<<endl;
+		cout<<view->midterm<<endl;
+		cout<<view->other<<endl;
+		cout<<view->total;
+	}		
+}
+void viewScoreBoardOfAClass (Node_class *a, Node_year *b){
+	Node_student *curStudent = a->ph_student;
+	double totalGPA = 0;
+	int countStudent = 0;
+	while (curStudent){
+		countStudent+=1;
+		cout<<curStudent->data.first_name<<" ";
+		if (b->s_cur == 1){
+			Node_course *curEnrolled = curStudent->ph_course_enrolled1;
+			double gpaCourse = 0;
+			int cnt = 0;
+			while (curEnrolled){
+				cnt+=1;
+				gpaCourse += curEnrolled->final;
+				cout<<curEnrolled->data.course_name<<":";
+				cout<<curEnrolled->final<<" ";
+				curEnrolled = curEnrolled->course_next;
+			}
+			cout<<"GPA:"<<(double)gpaCourse/cnt<<endl;
+			totalGPA += gpaCourse;
+		}
+		if (b->s_cur == 2){
+			Node_course *curEnrolled = curStudent->ph_course_enrolled2;
+			double gpaCourse = 0;
+			int cnt = 0;
+			while (curEnrolled){
+				cnt+=1;
+				gpaCourse += curEnrolled->final;
+				cout<<curEnrolled->data.course_name<<":";
+				cout<<curEnrolled->final<<" ";
+				curEnrolled = curEnrolled->course_next;
+			}
+			cout<<"GPA:"<<(double)gpaCourse/cnt<<endl;
+			totalGPA += gpaCourse;			
+		}
+		if (b->s_cur == 3){
+			Node_course *curEnrolled = curStudent->ph_course_enrolled3;
+			double gpaCourse = 0;
+			int cnt = 0;
+			while (curEnrolled){
+				cnt+=1;
+				gpaCourse += curEnrolled->final;
+				cout<<curEnrolled->data.course_name<<":";
+				cout<<curEnrolled->final<<" ";
+				curEnrolled = curEnrolled->course_next;
+			}
+			cout<<"GPA:"<<(double)gpaCourse/cnt<<endl;
+			totalGPA += gpaCourse;			
+		}				
+		curStudent = curStudent->student_next;
+	}
+	cout<<"Total GPA of this class: "<<(double)totalGPA/countStudent;
+}
+void updateScoreBoardOfACourse(Node_course *&a, Node_year *b){
+	fstream fs;
+	fs.open("CoursesData\\Semester " + to_string(b->s_cur) +"\\Courses.txt");
+	while (!fs.eof()){
+		string s;
+		fs>>s;
+		fstream fs1;
+		fs1.open("CoursesData\\Semester " + to_string(b->s_cur ) + "\\" + s + ".csv");
+		while (!fs1.eof()){
+			long mssv;
+			double x,y,z,t;
+			fs1.ignore();
+			fs1.ignore();
+			fs1>>mssv;
+			Node_student *curStudent = find_node_student_for_login_account(mssv,b);
+			fs.ignore();
+			string ign;
+			getline(fs,ign,',');
+			fs1.ignore();
+			fs1>>x;
+			fs1.ignore();
+			fs1>>y;
+			fs1.ignore();
+			fs1>>z;
+			fs1.ignore();
+			fs1>>t;
+			updateStudentResult(curStudent,b,s,x,y,z,t);
+		}
+	}
 }
 bool check_year_name_appropriate(string year_name)
 {
@@ -720,7 +923,7 @@ void enroll_course(Node_student* student_login, Node_year* current_year)
 			cout << "Choose a course: "; cin >> no_course;
 			Node_course* course_choose = find_course(semester_choose->ph_course, no_course);
 			if (check_not_over_max_student_in_a_course(course_choose->ph_student_enrolled, course_choose->data.max_num_student))
-				if (check_course_sessions(course_choose, *ph_course_enrolled))// check xem c� b? tr�ng gi? h?c kh�ng?
+				if (check_course_sessions(course_choose, *ph_course_enrolled))// check xem có bị trùng giờ học không?
 				{
 					cout << "Enrolling succeeded!\n";
 					add_enrolled_course(*ph_course_enrolled, course_choose);
@@ -742,7 +945,7 @@ void menu_for_teacher(Node_year*& ph_year, Node_year*& current_year)
 {
 	string year_name;
 	int choice;
-	//giao di?n menu
+	//giao diện menu
 	do {
 		cout << "1.Create year\n" << "2.Show years\n" << "3.Choose Year\n" << "0.Quit\n" << "Your option: "; cin >> choice;
 		if (choice == 1)
@@ -778,7 +981,7 @@ void menu_for_teacher(Node_year*& ph_year, Node_year*& current_year)
 			/////////////////////////////////////////////////////////
 			do
 			{
-				cout << "1.Create class\n" << "2.Delete class\n" << "3.Add Students\n" << "4.Add Semester\n"<< "5.Add Course\n" << "6.Delete Course\n" << "0.Quit\n";
+				cout << "1.Create class\n" << "2.Delete class\n" << "3.Add Students\n" << "4.Add Semester\n"<< "5.Add Course\n" << "6.Delete Course\n" <<"7.Add scoreboard"<< "0.Quit\n";
 				cin >> choices;
 				//Create class
 				if (choices == 1)
@@ -882,8 +1085,10 @@ void menu_for_teacher(Node_year*& ph_year, Node_year*& current_year)
 						else cout << "There is no any course to delete\n";
 					}
 					else cout << "No semester has been created";
-					
 				}
+				if (choices == 7){
+					updateScoreBoardOfACourse(ph_year->ph_semester->ph_course->ph_student_enrolled, current_year);
+				}					
 			} while (choices != 0);
 
 		}
@@ -912,8 +1117,11 @@ void menu_for_student(long a, Node_year* ph_year, Node_year* current_year)
 		else if (choice == 2) {
 			print_enrolled_course(student_login);
 		}
-		else {
+		else if (choice == 3) {
 			deleteEnrolledCourse(student_login);
+		}
+		else if (choice == 4){
+			viewScoreBoardByStudent(student_login,current_year);
 		}
 	} while (choice != 0);
 
@@ -973,143 +1181,6 @@ bool login(long a) {
 		return 0;
 	}
 }
-//void printExistedCourses(fstream &fs){
-//	fs.open("CoursesData\\Semester 1\\Courses.txt");
-//	while (!fs.eof()){
-//		string s;
-//		fs>>s;
-//		cout<<s<<endl;
-//	}
-//	fs.close();
-//}
-void updateStudentResult(Node_student *&a, Node_year *b,string s, double x, double y, double z, double t,){
-	//use while loop to get each  student ID then use the find_student by id to make changes
-	if (b->s_cur == 1){
-		Node_course *cur = a->ph_course_enrolled1;
-		while (cur->data->course_name != s){
-			cur = cur->course_next->next;
-		}
-		cur->total = x;
-		cur->final = y;
-		cur->midterm = z;
-		cur->other = t;
-	}
-	if (b->s_cur == 2){
-		Node_course *cur = a->ph_course_enrolled2;
-		while (cur->data->course_name != s){
-			cur = cur->course_next->next;
-		}
-		cur->total = x;
-		cur->final = y;
-		cur->midterm = z;
-		cur->other = t;
-	}
-	if (b->s_cur == 3){
-		Node_course *cur = a->ph_course_enrolled3;
-		while (cur->data->course_name != s){
-			cur = cur->course_next->next;
-		}
-		cur->total = x;
-		cur->final = y;
-		cur->midterm = z;
-		cur->other = t;
-	}		
-}
-void viewScoreBoardOfACourse(Node_year *a;){
-	fstream fs;
-	fs.open("CoursesData\\Semester " + to_string(a->s_cur) +"\\Courses.txt");
-	while (!fs.eof()){
-		string s;
-		fs>>s;
-		cout<<s<<endl;
-	}
-	cout<<"Which course do you want to view? ";
-	string b;
-	cin>>b;
-	fstream fs1;
-	fs1.open("CoursesData\\Semester " + to_string(a->s_cur) +"\\" + b +".csv");
-	while(!fs1.eof()){
-		string c;
-		getline(fs,c);
-		cout<<c<<endl;
-	}
-	fs1.close();
-	fs.close();
-} //view scoreboard
-void viewScoreBoardByStudent (Node_student *a, Node_year *b){
-	// use find_node_student_for_login_account function to Node student a
-	if (b.s_cur == 1){
-		Node_course *view = a->ph_course_enrolled1
-		Node_course *cur = a->ph_course_enrolled1;
-		while (cur){
-			cout<<cur->data->course_name<<endl;
-			cur = cur->course_next;
-		}
-		cout<<"Which course to view?";
-		string s;
-		cin>>s;
-		while (view->data->course_name!=s){
-			view = view->course_next;
-		}
-		cout<<view->final<<endl;
-		cout<<view->midterm<<endl;
-		cout<<view->other<<endl;
-		cout<<view->total;
-	}
-}
-void viewScoreBoardOfAClass (Node_class *a, Node_year *b){
-	Node_student *curStudent = a->ph_student;
-	double totalGPA = 0;
-	int countStudent = 0;
-	while (curStudent){
-		countStudent+=1;
-		cout<<curStudent->data->first_name<<" ";
-		if (b->s_cur == 1){
-			Node_course *curEnrolled = curStudent->ph_course_enrolled1;
-			double gpaCourse = 0;
-			int cnt = 0;
-			while (curEnrolled){
-				cnt+=1;
-				gpaCourse += curEnrolled->final;
-				cout<<curEnrolled->data->course_name<<":";
-				cout<<curEnrolled->final<<" ";
-				curEnrolled = curEnrolled->course_next;
-			}
-			cout<<"GPA:"<<(double)gpaCourse/cnt<<endl;
-			totalGPA += gpaCourse;
-		}
-		if (b->s_cur == 2){
-			Node_course *curEnrolled = curStudent->ph_course_enrolled2;
-			double gpaCourse = 0;
-			int cnt = 0;
-			while (curEnrolled){
-				cnt+=1;
-				gpaCourse += curEnrolled->final;
-				cout<<curEnrolled->data->course_name<<":";
-				cout<<curEnrolled->final<<" ";
-				curEnrolled = curEnrolled->course_next;
-			}
-			cout<<"GPA:"<<(double)gpaCourse/cnt<<endl;
-			totalGPA += gpaCourse;			
-		}
-		if (b->s_cur == 3){
-			Node_course *curEnrolled = curStudent->ph_course_enrolled3;
-			double gpaCourse = 0;
-			int cnt = 0;
-			while (curEnrolled){
-				cnt+=1;
-				gpaCourse += curEnrolled->final;
-				cout<<curEnrolled->data->course_name<<":";
-				cout<<curEnrolled->final<<" ";
-				curEnrolled = curEnrolled->course_next;
-			}
-			cout<<"GPA:"<<(double)gpaCourse/cnt<<endl;
-			totalGPA += gpaCourse;			
-		}				
-		curStudent = curStudent->student_next;
-	}
-	cout<<"Total GPA of this class: "<<(double)totalGPA/countStudent;
-}
 int main()
 {
 	Node_year* ph_year = NULL;
@@ -1136,4 +1207,3 @@ int main()
 //	printExistedCourses(fs);
 	return 0;
 }
-
