@@ -3,7 +3,9 @@
 #include <string>
 #include <cstring>
 #include <time.h>
+#include <unistd.h>
 using namespace std;
+struct Node_student;
 struct COURSE_DATA
 {
 	//course id, course name, teacher name, number of credits, the maximum number of students in the course(default 50), day of the week, and the session that the course will be performed(MON / TUE / WED / THU / FRI / SAT, S1(07:30), S2(09:30), S3(13:30) and S4(15:30)).A course will be taught in 2 sessions in a week
@@ -678,7 +680,7 @@ void viewScoreBoardOfACourse(Node_year *a){
 	fs1.open("CoursesData\\Semester " + to_string(a->s_cur) +"\\" + b +".csv");
 	while(!fs1.eof()){
 		string c;
-		getline(fs,c);
+		getline(fs1,c);
 		cout<<c<<endl;
 	}
 	fs1.close();
@@ -794,7 +796,7 @@ void viewScoreBoardOfAClass (Node_class *a, Node_year *b){
 	}
 	cout<<"Total GPA of this class: "<<(double)totalGPA/countStudent;
 }
-void updateScoreBoardOfACourse(Node_course *&a, Node_year *b){
+void updateScoreBoardOfACourse(Node_year *b){
 	fstream fs;
 	fs.open("CoursesData\\Semester " + to_string(b->s_cur) +"\\Courses.txt");
 	while (!fs.eof()){
@@ -802,27 +804,35 @@ void updateScoreBoardOfACourse(Node_course *&a, Node_year *b){
 		fs>>s;
 		fstream fs1;
 		fs1.open("CoursesData\\Semester " + to_string(b->s_cur ) + "\\" + s + ".csv");
-		while (!fs1.eof()){
-			long mssv;
-			double x,y,z,t;
-			fs1.ignore();
-			fs1.ignore();
-			fs1>>mssv;
-			Node_student *curStudent = find_node_student_for_login_account(mssv,b);
-			fs.ignore();
-			string ign;
-			getline(fs,ign,',');
-			fs1.ignore();
-			fs1>>x;
-			fs1.ignore();
-			fs1>>y;
-			fs1.ignore();
-			fs1>>z;
-			fs1.ignore();
-			fs1>>t;
-			updateStudentResult(curStudent,b,s,x,y,z,t);
+		if (fs1.is_open()){
+			while (!fs1.eof()){
+				long mssv;
+				double x,y,z,t;
+				string ign;
+				fs1.ignore();
+				fs1.ignore();
+				fs1>>mssv;
+				Node_student *curStudent = find_node_student_for_login_account(mssv,b);
+				if (curStudent == nullptr) break;
+				fs1.ignore();
+				getline(fs1,ign,',');
+				fs1>>x;
+				fs1.ignore();
+				fs1>>y;
+				fs1.ignore();
+				fs1>>z;
+				fs1.ignore();
+				fs1>>t;
+				fs1.ignore();
+				updateStudentResult(curStudent,b,s,x,y,z,t);
+				cout<<mssv<<endl;
+				cout<<x<<" "<<y<<" "<<z<<" "<<t<<endl;
+				sleep(2);
+			}		
 		}
+		fs1.close();
 	}
+	fs.close();
 }
 bool check_year_name_appropriate(string year_name)
 {
@@ -981,7 +991,7 @@ void menu_for_teacher(Node_year*& ph_year, Node_year*& current_year)
 			/////////////////////////////////////////////////////////
 			do
 			{
-				cout << "1.Create class\n" << "2.Delete class\n" << "3.Add Students\n" << "4.Add Semester\n"<< "5.Add Course\n" << "6.Delete Course\n" <<"7.Add scoreboard"<< "0.Quit\n";
+				cout << "1.Create class\n" << "2.Delete class\n" << "3.Add Students\n" << "4.Add Semester\n"<< "5.Add Course\n" << "6.Delete Course\n" <<"7.Add scoreboard\n"<<"8.View scoreboard of a course\n"<<"0.Quit\n";
 				cin >> choices;
 				//Create class
 				if (choices == 1)
@@ -1087,7 +1097,10 @@ void menu_for_teacher(Node_year*& ph_year, Node_year*& current_year)
 					else cout << "No semester has been created";
 				}
 				if (choices == 7){
-					updateScoreBoardOfACourse(ph_year->ph_semester->ph_course->ph_student_enrolled, current_year);
+					updateScoreBoardOfACourse(current_year);
+				}
+				if (choices == 8){
+					viewScoreBoardOfACourse(current_year);
 				}					
 			} while (choices != 0);
 
@@ -1108,7 +1121,7 @@ void menu_for_student(long a, Node_year* ph_year, Node_year* current_year)
 	int choice;
 	do
 	{
-		cout << "1.Enroll course\n" << "2.View a list of enrolled courses\n" << "3.Delete an enrolled course\n" << "0.Quit\n" << "Your option:";
+		cout << "1.Enroll course\n" << "2.View a list of enrolled courses\n" << "3.Delete an enrolled course\n"<<"4. View your scoreboard\n"<< "0.Quit\n" << "Your option:";
 		cin >> choice;
 		if (choice == 1)
 		{

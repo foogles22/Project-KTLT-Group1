@@ -7,34 +7,3 @@ Le Van Chanh
 S1
 S2
 CSC1000
-VTP2
-Le Van Chanh
-4
-50
-11
-S1
-S2
-CSC1000
-VTP3
-Le Van Chanh
-4
-50
-11
-S1
-S2
-CSC1000
-VTP4
-Le Van Chanh
-4
-50
-11
-S1
-S2
-CSC1000
-VTP5
-Le Van Chanh
-4
-50
-11
-S1
-S2
