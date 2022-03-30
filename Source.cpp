@@ -9,6 +9,7 @@
 #include <ctime>
 using namespace std;
 time_t now;
+bool update = 0;
 // Các hàm làm giao diện
 void gotoXY(SHORT posX, SHORT posY)
 {
@@ -315,6 +316,30 @@ bool check_year_end(Node_year*& current_year)
 	}
 	else return 1;
 }
+bool check_not_end_semester(Node_year*& current_year)
+{
+	check_time_for_semester(current_year);
+	time_t cur_time = time(0);
+	if (current_year->semestercount == 1)
+		if (cur_time <= now + 300)
+		{
+			print_double_square(30, 10, 26, 3, 15, "Semester 1 has not ended");
+			return 0;
+		}
+	if (current_year->semestercount == 2)
+		if (cur_time <= now + 300)
+		{
+			print_double_square(30, 10, 26, 3, 15, "Semester 2 has not ended");
+			return 0;
+		}
+	if (current_year->semestercount == 3)
+		if (cur_time <= now + 300)
+		{
+			print_double_square(30, 10, 26, 3, 15, "Semester 3 has not ended");
+			return 0;
+		}
+	return 1;
+}
 // Các hàm tìm node
 Node_class* find_class_by_name(Node_class* ph_class, string class_name)
 {
@@ -507,7 +532,7 @@ void deleteEnrolledCourse(Node_student*& student, Node_year*& current_year) {
 		print_double_square(30, 10, 37, 3, 15, "You have not enrolled in any course");
 		return;
 	}
-	Node_course** ph_course_enrolled{};
+	Node_course** ph_course_enrolled = nullptr;
 	check_time_for_semester(current_year);
 	if (current_year->semestercount == 1)
 		ph_course_enrolled = &(student->ph_course_enrolled1);
@@ -526,8 +551,8 @@ void deleteEnrolledCourse(Node_student*& student, Node_year*& current_year) {
 	{
 		delete_specific_course(*ph_course_enrolled, course_choose);
 		print_double_square(30, 15, 34, 3, 15, "Delete enrolled course succeeded");
-		Node_semester* semester_choose{};
-		Node_course* course_choose_del{};
+		Node_semester* semester_choose = nullptr;
+		Node_course* course_choose_del = nullptr;
 		if (current_year->semestercount == 1)
 			semester_choose = find_semester(current_year->ph_semester, "1");
 		if (current_year->semestercount == 2)
@@ -651,14 +676,14 @@ void viewCourse_Student(Node_student* student_login, Node_year* current_year)
 		return;
 	}
 	check_time_for_semester(current_year);
-	Node_course* ph_enrolled_course{};
+	Node_course* ph_enrolled_course = nullptr;
 	if (current_year->semestercount == 1)
 		ph_enrolled_course = student_login->ph_course_enrolled1;
 	if (current_year->semestercount == 2)
 		ph_enrolled_course = student_login->ph_course_enrolled2;
 	if (current_year->semestercount == 3)
 		ph_enrolled_course = student_login->ph_course_enrolled3;
-	
+
 	viewListofcourse(ph_enrolled_course);
 
 }
@@ -817,8 +842,8 @@ bool check_not_over_max_student_in_a_course(Node_student* ph_student_enrolled, i
 void enroll_course(Node_student* student_login, Node_year*& current_year)
 {
 	int no_course;
-	Node_semester* semester_choose{};
-	Node_course** ph_course_enrolled{};
+	Node_semester* semester_choose = nullptr;
+	Node_course** ph_course_enrolled = nullptr;
 	check_time_for_semester(current_year);
 	cout << current_year->semestercount;
 	if (current_year->semestercount == 1)
@@ -1239,7 +1264,7 @@ void print_teacher_after_creating_year_menu(Node_year*& year_choose)
 			print_Viennen(235, 63);
 			if (year_choose != NULL && year_choose->ph_semester != NULL)
 				print_fill_square(183, 60, 14, 3, 15, "Semester " + to_string(year_choose->semestercount));
-				print_fill_square(196, 60, 13, 3, 15, year_choose->name);;
+			print_fill_square(196, 60, 13, 3, 15, year_choose->name);;
 			text(112, 3, "BEING LOGGED IN BY TEACHER", 0, 15);
 			move = _getch();
 			if (move == 'w' || move == 72)
@@ -1385,7 +1410,7 @@ void print_teacher_creating_year_menu(Node_year*& ph_year, Node_year*& current_y
 {
 	string year_name;
 	int choose = 1;	char move;
-	bool update = 0;
+	
 	do {
 		system("CLS");
 		print_year_section(choose);
@@ -1393,7 +1418,7 @@ void print_teacher_creating_year_menu(Node_year*& ph_year, Node_year*& current_y
 			print_duongthang(25, 1, 62);
 			print_duongngang(2, 5, 23);
 			print_duongngang(26, 5, 208);
-			print_current_time(208,60);
+			print_current_time(208, 60);
 			if (current_year != NULL && current_year->ph_semester != NULL)
 				print_fill_square(183, 60, 14, 3, 15, "Semester " + to_string(current_year->semestercount));
 			if (ph_year != NULL)
@@ -1477,7 +1502,7 @@ void print_teacher_creating_year_menu(Node_year*& ph_year, Node_year*& current_y
 				{
 					check_time_for_semester(current_year);
 
-					Node_semester* semester_choose{};
+					Node_semester* semester_choose = nullptr;
 					int no;
 					if (current_year->semestercount == 1)
 					{
@@ -1540,56 +1565,66 @@ void print_teacher_creating_year_menu(Node_year*& ph_year, Node_year*& current_y
 		//Export
 		if (choose == 6)
 		{
-			Node_semester* semester_choose{};
-			if (current_year->semestercount == 1)
-				semester_choose = find_semester(current_year->ph_semester, "1");
-			if (current_year->semestercount == 2)
-				semester_choose = find_semester(current_year->ph_semester, "2");
-			if (current_year->semestercount == 3)
-				semester_choose = find_semester(current_year->ph_semester, "3");			
-			export_studentIncourse_to_csv(semester_choose->ph_course, current_year);
+			if (check_not_end_semester(current_year))
+			{
+				Node_semester* semester_choose = nullptr;
+				if (current_year->semestercount == 1)
+					semester_choose = find_semester(current_year->ph_semester, "1");
+				if (current_year->semestercount == 2)
+					semester_choose = find_semester(current_year->ph_semester, "2");
+				if (current_year->semestercount == 3)
+					semester_choose = find_semester(current_year->ph_semester, "3");
+				export_studentIncourse_to_csv(semester_choose->ph_course, current_year);
+				print_double_square(30, 10, 19, 3, 15, "Export succeeded!");
+			}
 			_getch();
 		}
 		//Update scoreboard
 		if (choose == 7)
 		{
-			updateScoreBoardOfACourse(current_year);
-			update = 1;
+			if (check_not_end_semester(current_year))
+			{
+				updateScoreBoardOfACourse(current_year);
+				update = 1;
+			}
 			_getch();
 		}
-		if (choose == 8 )
+		if (choose == 8)
 		{
-			if (update)
+			if (check_not_end_semester(current_year))
 			{
-				print_double_square(30, 10, 31, 3, 15, "1.View scoreboard of a course");
-				print_double_square(61, 10, 30, 3, 15, "2.View scoreboard of a class");
-				print_type_in_box(30, 15, "Your option", 5);
-				int choose;  cin >> choose;
-				if(choose == 1)
-					viewScoreBoardOfACourse(current_year);
-				else
+				if (update)
 				{
-					if (ph_year->ph_classes != NULL)
+					print_double_square(30, 10, 31, 3, 15, "1.View scoreboard of a course");
+					print_double_square(61, 10, 30, 3, 15, "2.View scoreboard of a class");
+					print_type_in_box(30, 15, "Your option", 5);
+					int choose;  cin >> choose;
+					if (choose == 1)
+						viewScoreBoardOfACourse(current_year);
+					else
 					{
-						int class_no;
-						int year_no;
-						viewAllClass(ph_year);
-						print_type_in_box(30, 20, "Choose a school year", 5);
-						cin >> year_no;
-						Node_year* year_choose = find_year(ph_year, year_no);
-						print_type_in_box(30, 25, "Choose a class", 5);
-						cin >> class_no;
-						Node_class* class_choose = find_class(year_choose->ph_classes, class_no);
-						if (class_choose == NULL)
-							print_double_square(30, 30, 32, 3, 15, "Class not exists or not found!");
-						if (class_choose != NULL)
-							viewScoreBoardOfAClass(class_choose, current_year);
+						if (ph_year->ph_classes != NULL)
+						{
+							int class_no;
+							int year_no;
+							viewAllClass(ph_year);
+							print_type_in_box(30, 20, "Choose a school year", 5);
+							cin >> year_no;
+							Node_year* year_choose = find_year(ph_year, year_no);
+							print_type_in_box(30, 25, "Choose a class", 5);
+							cin >> class_no;
+							Node_class* class_choose = find_class(year_choose->ph_classes, class_no);
+							if (class_choose == NULL)
+								print_double_square(30, 30, 32, 3, 15, "Class not exists or not found!");
+							if (class_choose != NULL)
+								viewScoreBoardOfAClass(class_choose, current_year);
+						}
+						else print_double_square(30, 20, 31, 3, 15, "There is no any class to view");
 					}
-					else print_double_square(30, 20, 31, 3, 15, "There is no any class to view");
 				}
+				else
+					print_double_square(30, 10, 36, 3, 15, "Scoreboards have not been updated!");
 			}
-			else
-				print_double_square(30, 10, 36, 3, 15, "Scoreboards have not been updated!");
 			_getch();
 		}
 
@@ -1638,7 +1673,7 @@ void print_menu_for_student(long a, Node_year*& ph_year, Node_year*& current_yea
 				print_duongthang(25, 1, 62);
 				print_duongngang(2, 5, 23);
 				print_duongngang(26, 5, 208);
-				print_current_time(208,60);
+				print_current_time(208, 60);
 				if (ph_year != NULL)
 				{
 					string textx = "RECENTLY CREATED " + current_year->name;
@@ -1800,7 +1835,7 @@ void print_login_section(Node_year*& ph_year, Node_year*& current_year)
 	bool one = true, two = true;
 	do {
 		print_username_password(choose);
-		print_current_time(140,48);
+		print_current_time(140, 48);
 
 		do {
 			// 235, 63
@@ -1839,28 +1874,28 @@ void print_login_section(Node_year*& ph_year, Node_year*& current_year)
 				system("CLS"); choose = 1;
 			}
 			else
-			if (mssv == 1111)
-			{
-				print_teacher_creating_year_menu(ph_year, current_year);
-				system("CLS"); choose = 1;
-			}
-			else
-			{
-				print_login_status(46, 15, 0);
-				_getch();
-				system("CLS");
-			}
+				if (mssv == 1111)
+				{
+					print_teacher_creating_year_menu(ph_year, current_year);
+					system("CLS"); choose = 1;
+				}
+				else
+				{
+					print_login_status(46, 15, 0);
+					_getch();
+					system("CLS");
+				}
 			one = true; two = true;
 		}
 	} while (choose != 4);
 }
 //
-void export_studentIncourse_to_csv(Node_course * ph_course, Node_year *current_year)
+void export_studentIncourse_to_csv(Node_course* ph_course, Node_year* current_year)
 {
 	if (ph_course == NULL) return;
 	int count = 1;
 	Node_course* pc_course = ph_course;
-	fstream write("CoursesData\\Semester " + to_string(current_year->semestercount) + "\\Courses.txt", ios::app);
+	fstream write("CoursesData\\Semester " + to_string(current_year->semestercount) + "\\Courses.txt", ios::out);
 	while (pc_course != NULL)
 	{
 		string course_name = pc_course->data.course_name;
@@ -1946,7 +1981,7 @@ void viewScoreBoardOfACourse(Node_year* a) {
 	fstream fs2;
 	fs2.open("CoursesData\\Semester " + to_string(a->semestercount) + "\\Courses.txt");
 	string s;
-	while (no-- != 0) 
+	while (no-- != 0)
 		fs2 >> s;
 
 	int i1 = 1;
@@ -1977,13 +2012,13 @@ void viewScoreBoardOfACourse(Node_year* a) {
 		cout << c; for (int i = 0; i < 17 - c.length(); i++) cout << " ";
 		cout << d;
 	}
-	print_double_square(72, 15 + i2, 112, i1, 15, "\0");
+	print_double_square(72, 15 + i2, 112, i1-1, 15, "\0");
 	fs1.close();
 	fs.close();
 } //view scoreboard
 void viewScoreBoardByStudent(Node_student* a, Node_year* b) {
 	// use find_node_student_for_login_account function to Node student a
-	Node_course* view{};
+	Node_course* view = nullptr;
 	check_time_for_semester(b);
 	if (b->semestercount == 1)
 		view = a->ph_course_enrolled1;
@@ -1996,7 +2031,7 @@ void viewScoreBoardByStudent(Node_student* a, Node_year* b) {
 	print_type_in_box(30, 10, "Choose a course", 5);
 	int no; cin >> no;
 	view = find_course(view, no);
-	
+
 	gotoXY(80, 32);
 	cout << "Student ID          Fullname          Total Mark       Final Mark       Midterm Mark       Other Mark";
 	gotoXY(81, 33);
@@ -2014,59 +2049,48 @@ void viewScoreBoardByStudent(Node_student* a, Node_year* b) {
 }
 void viewScoreBoardOfAClass(Node_class* a, Node_year* b) {
 	Node_student* curStudent = a->ph_student;
+	Node_course* curEnrolled = nullptr;
 	double totalGPA = 0;
 	int countStudent = 0;
 	check_time_for_semester(b);
-	gotoXY(1,1);
-	cout << "No     Student ID     Fullname     ";
-		while (curStudent) {
+	int i = 1;
+	gotoXY(80, 32);
+	cout << "Student ID          Fullname          Course Name         Final Mark      GPA      Total GPA of class";
+
+	while (curStudent) {
 		countStudent += 1;
-		cout << curStudent->data.first_name << " ";
-		if (b->semestercount == 1) {
-			Node_course* curEnrolled = curStudent->ph_course_enrolled1;
-			double gpaCourse = 0;
-			int cnt = 0;
-			while (curEnrolled) {
-				cnt += 1;
-				gpaCourse += curEnrolled->final;
-				cout << curEnrolled->data.course_name << ":";
-				cout << curEnrolled->final << " ";
-				curEnrolled = curEnrolled->course_next;
-			}
-			cout << "GPA:" << (double)gpaCourse / cnt << endl;
-			totalGPA += gpaCourse;
+		if (b->semestercount == 1)
+			curEnrolled = curStudent->ph_course_enrolled1;
+		if (b->semestercount == 2)
+			curEnrolled = curStudent->ph_course_enrolled2;
+		if (b->semestercount == 3)
+			curEnrolled = curStudent->ph_course_enrolled3;
+
+		double gpacourse = 0;
+		int cnt = 0;
+		while (curEnrolled) {
+			gotoXY(81, 32 + i++);
+			cout << curStudent->data.ID;
+			for (int i = 0; i < 6; i++) cout << " ";
+			cout << curStudent->data.first_name << " ";
+			cout << curStudent->data.lastname;
+			cnt += 1;
+			gpacourse += curEnrolled->final;
+			for (int i = 0; i < 26 - (curStudent->data.first_name.length() + curStudent->data.lastname.length()); i++) cout << " ";
+			cout << curEnrolled->data.course_name << "                 ";
+			cout << curEnrolled->final << "           ";
+			curEnrolled = curEnrolled->course_next;
 		}
-		if (b->semestercount == 2) {
-			Node_course* curEnrolled = curStudent->ph_course_enrolled2;
-			double gpaCourse = 0;
-			int cnt = 0;
-			while (curEnrolled) {
-				cnt += 1;
-				gpaCourse += curEnrolled->final;
-				cout << curEnrolled->data.course_name << ":";
-				cout << curEnrolled->final << " ";
-				curEnrolled = curEnrolled->course_next;
-			}
-			cout << "GPA:" << (double)gpaCourse / cnt << endl;
-			totalGPA += gpaCourse;
-		}
-		if (b->semestercount == 3) {
-			Node_course* curEnrolled = curStudent->ph_course_enrolled3;
-			double gpaCourse = 0;
-			int cnt = 0;
-			while (curEnrolled) {
-				cnt += 1;
-				gpaCourse += curEnrolled->final;
-				cout << curEnrolled->data.course_name << ":";
-				cout << curEnrolled->final << " ";
-				curEnrolled = curEnrolled->course_next;
-			}
-			cout << "GPA:" << (double)gpaCourse / cnt << endl;
-			totalGPA += gpaCourse;
-		}
+
+		cout << (double)gpacourse / cnt;
+		totalGPA += (double)gpacourse / cnt;
+
 		curStudent = curStudent->student_next;
 	}
-	cout << "Total GPA of this class: " << (double)totalGPA / countStudent;
+	gotoXY(172, 32 + i);
+	cout << (double)totalGPA / countStudent;
+	print_double_square(79, 32, 103, i + 1, 15, "\0");
+
 }
 void updateScoreBoardOfACourse(Node_year* b) {
 	check_time_for_semester(b);
