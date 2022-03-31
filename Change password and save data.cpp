@@ -1,5 +1,6 @@
 void saveStudentData(Node_year *a){
 	fstream fs;
+	Node_year *d = a;
 	while (a){
 		Node_class *b = a->ph_classes;
 		while (b){
@@ -17,6 +18,18 @@ void saveStudentData(Node_year *a){
 		}
 		a = a->year_next;
 	}
+	fs.open("StudentData\\CreatedClass.txt", ios::out);
+	while (d){
+		Node_class *e = d->ph_classes;
+		while (e){
+			fs<<e->name;
+			e = e->class_next;
+			if (e) fs<<endl;
+		}
+		d = d->year_next;
+		if (d) fs<<endl;
+	}
+	fs.close();
 }
 void changePassword(Node_student *&a, string b){
 	a->data.password = b;
