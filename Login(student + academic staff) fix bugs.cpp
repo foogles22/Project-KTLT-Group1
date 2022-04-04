@@ -76,8 +76,11 @@ int login(string a) {
 					return 2;
 				}
 			}
+			else{
+				getline(fs,s);
+			}
 		}
 		cout<<"Failed Login!\n";
-		return 0;	
+		return 0;
 	}
 }
