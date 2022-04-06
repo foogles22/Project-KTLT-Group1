@@ -192,14 +192,14 @@ void loadFileCourse(Node_year*& ph_y){
 			while(!fCourse.eof()){
 				if(!sCur->ph_course){
 					sCur->ph_course = new Node_course;
-					getline(fCourse, sCur->ph_course->data.id);
-					getline(fCourse, sCur->ph_course->data.course_name);
-					getline(fCourse, sCur->ph_course->data.teacher_name);
-					getline(fCourse, sCur->ph_course->data.number_of_credits);
-					getline(fCourse, sCur->ph_course->data.max_num_student);
-					getline(fCourse, sCur->ph_course->data.days_of_week);
-					getline(fCourse, sCur->ph_course->data.session1);
-					getline(fCourse, sCur->ph_course->data.session2);
+					fCourse >> sCur->ph_course->data.id;
+					fCourse >> sCur->ph_course->data.course_name;
+					fCourse >> sCur->ph_course->data.teacher_name;
+					fCourse >> sCur->ph_course->data.number_of_credits;
+					fCourse >> sCur->ph_course->data.max_num_student;
+					fCourse >> sCur->ph_course->data.days_of_week;
+					fCourse >> sCur->ph_course->data.session1;
+					fCourse >> sCur->ph_course->data.session2;
 					cCur = sCur->ph_course;
 				}
 				else{
