@@ -168,6 +168,7 @@ void loadFileCourse(Node_year*& ph_y){
 				if(!yCur->ph_semester){
 					yCur->ph_semester = new Node_semester;
 					yCur->ph_semester->semester_no = "Semester " + to_string(i);
+					yCur->ph_semester->semester_next = 0;
 					sCur = yCur->ph_semester;
 				}
 				else{
@@ -181,14 +182,15 @@ void loadFileCourse(Node_year*& ph_y){
 		}
 		yCur = yCur->year_next;
 	}
+	fStu.close();
 
 	fstream fCourse;
 	yCur = ph_y;
 	Node_course* cCur;
-	sCur = yCur->ph_semester;
 	while(yCur){
+		sCur = yCur->ph_semester;
 		while(sCur){
-			fCourse.open("D:\\CODE\\Project-KTLT-Group1-main\\StudentData\\" + yCur->name.substr(2,2) + "\\Semester 1.txt", ios::in);
+			fCourse.open("D:\\CODE\\Project-KTLT-Group1-main\\StudentData\\" + yCur->name.substr(2,2) + "\\" + sCur->semester_no + ".txt", ios::in);
 			while(!fCourse.eof()){
 				if(!sCur->ph_course){
 					sCur->ph_course = new Node_course;
@@ -228,7 +230,6 @@ int main(){
 	Node_year* y = 0;
 	loadFileStudent(y);
 	loadFileCourse(y);
-	       
 	while(y){
 		while(y->ph_semester){
 			cout << y->ph_semester->semester_no;
