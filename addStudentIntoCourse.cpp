@@ -5,7 +5,7 @@ Node_student* findStudent(Node_year* ph_y, string id){
         while(classCur){
             Node_student* stuCur = classCur->ph_student;
             while(stuCur){
-				if(stuCur->data.ID == id)
+		if(stuCur->data.ID == id)
                 	return stuCur;
                 stuCur = stuCur->student_next;
             }
@@ -23,7 +23,7 @@ void addStudentIntoCourse(Node_year*& ph_y){
         Node_course* cCur = sCur->ph_course;
         while(cCur){
             fstream f;
-            f.open("D:\\CODE\\PJ - me\\Project-KTLT-Group1-main\\Project-KTLT-Group1-main\\CoursesData\\" + sCur->semester_no + "\\" + cCur->data.course_name + ".csv");
+            f.open("CoursesData\\" + sCur->semester_no + "\\" + cCur->data.course_name + ".csv");
             while(!f.eof()){
                 Node_student* stuCur;
 				if(!cCur->ph_student_enrolled){
