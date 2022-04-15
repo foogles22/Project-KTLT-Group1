@@ -26,23 +26,25 @@ void addStudentIntoCourse(Node_year*& ph_y){
             f.open("CoursesData\\" + sCur->semester_no + "\\" + cCur->data.course_name + ".csv");
             while(!f.eof()){
                 Node_student* stuCur;
-				if(!cCur->ph_student_enrolled){
-					string tmp;
-                    f >> tmp;
-                    f >> tmp;
-                    cCur->ph_student_enrolled = findStudent(ph_y,tmp);
-					stuCur = cCur->ph_student_enrolled;
-				}
-				else{
-					string tmp;
-					f >> tmp;
-					f >> tmp;
-					stuCur->student_next = findStudent(ph_y,tmp);
-					stuCur->student_next->student_next = 0;
-					stuCur = stuCur->student_next;
-				}
-			}
-			f.close();
+		if(!cCur->ph_student_enrolled){
+			string tmp;
+                    	f >> tmp;
+			f >> tmp;
+                    	cCur->ph_student_enrolled = findStudent(ph_y,tmp);
+			stuCur = cCur->ph_student_enrolled;
 		}
+		else{
+			string tmp;
+			f >> tmp;
+			f >> tmp;
+			stuCur->student_next = findStudent(ph_y,tmp);
+			stuCur->student_next->student_next = 0;
+			stuCur = stuCur->student_next;
+		}
+	    }
+	f.close();
+	cCur = cCur -> course_next;
+	}
+sCur = sCur -> semester_next;
     }
 }
