@@ -84,7 +84,7 @@ void loadFileStudent(Node_year *& ph_y){
 	Node_class* cCur = 0;
 	fstream fiClass;
 	while(yCur){
-		fiClass.open("D:\\CODE\\Project-KTLT-Group1-main\\StudentData\\" + yCur->name.substr(2,2) + "\\CreatedClass.txt", ios::in);
+		fiClass.open("StudentData\\" + yCur->name.substr(2,2) + "\\CreatedClass.txt", ios::in);
 		while(!fiClass.eof()){
 			if(!yCur->ph_classes){
 				yCur->ph_classes = new Node_class;
@@ -111,7 +111,7 @@ void loadFileStudent(Node_year *& ph_y){
 	while(yCur){
 		cCur = yCur->ph_classes;
 		while(cCur){
-			fiStudent.open("D:\\CODE\\Project-KTLT-Group1-main\\StudentData\\" + yCur->name.substr(2,2) + "\\" + cCur->name + ".csv", ios::in);
+			fiStudent.open("StudentData\\" + yCur->name.substr(2,2) + "\\" + cCur->name + ".csv", ios::in);
 			while(!fiStudent.eof()){
 				if(!cCur->ph_student){
 					cCur->ph_student = new Node_student;
@@ -162,7 +162,7 @@ void loadFileCourse(Node_year*& ph_y){
 	Node_semester* sCur;
 	while(yCur){
 		for(int i = 1; i < 4; ++i){
-			fStu.open("D:\\CODE\\Project-KTLT-Group1-main\\StudentData\\" + yCur->name.substr(2,2) + "\\Semester " + to_string(i) + ".txt", ios::in);
+			fStu.open("StudentData\\" + yCur->name.substr(2,2) + "\\Semester " + to_string(i) + ".txt", ios::in);
 			if(!fStu.is_open());
 			else{
 				if(!yCur->ph_semester){
@@ -190,7 +190,7 @@ void loadFileCourse(Node_year*& ph_y){
 	while(yCur){
 		sCur = yCur->ph_semester;
 		while(sCur){
-			fCourse.open("D:\\CODE\\Project-KTLT-Group1-main\\StudentData\\" + yCur->name.substr(2,2) + "\\" + sCur->semester_no + ".txt", ios::in);
+			fCourse.open("StudentData\\" + yCur->name.substr(2,2) + "\\" + sCur->semester_no + ".txt", ios::in);
 			while(!fCourse.eof()){
 				if(!sCur->ph_course){
 					sCur->ph_course = new Node_course;
