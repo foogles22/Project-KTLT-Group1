@@ -30,29 +30,21 @@ void addStudentIntoCourse(Node_year*& ph_y){
 					string tmp;
                     getline(f,tmp,',');
                     getline(f,tmp,',');
-					cout << tmp;
                     cCur->ph_student_enrolled = findStudent(ph_y,tmp);
 					stuCur = cCur->ph_student_enrolled;
-					getline(f,tmp,',');
-					getline(f,tmp,',');
-					getline(f,tmp,',');
-					getline(f,tmp,',');
-					getline(f,tmp,',');
+					for(int i = 0; i < 5; ++i)
+						getline(f,tmp,',');
 					getline(f,tmp);
 				}
 				else{
 					string tmp;
 					getline(f,tmp,',');
                     getline(f,tmp,',');
-					cout << tmp;
 					stuCur->student_next = findStudent(ph_y,tmp);
 					stuCur->student_next->student_next = 0;
 					stuCur = stuCur->student_next;
-					getline(f,tmp,',');
-					getline(f,tmp,',');
-					getline(f,tmp,',');
-					getline(f,tmp,',');
-					getline(f,tmp,',');
+					for(int i = 0; i < 5; ++i)
+						getline(f,tmp,',');
 					getline(f,tmp);
 				}
 			}
