@@ -17,21 +17,21 @@ Node_student* findStudent(Node_year* ph_y, string id){
     return 0;
 }
 
-void addStudentIntoCourse(Node_year*& ph_y){
-    Node_semester* sCur = ph_y->ph_semester;
+void addStudentIntoCourse(Node_year*& currentYear, Node_year* pHallyear){
+    Node_semester* sCur = currentYear->ph_semester;
     while(sCur){
         Node_course* cCur = sCur->ph_course;
         while(cCur){
             fstream f;
-            f.open("D:\\CODE\\PJ - me\\Project-KTLT-Group1-main\\Project-KTLT-Group1-main\\CoursesData\\" + sCur->semester_no + "\\" + cCur->data.course_name + ".csv");
+            f.open("CoursesData\\" + sCur->semester_no + "\\" + cCur->data.course_name + ".csv");
             while(!f.eof()){
                 Node_student* stuCur;
-		if(!cCur->ph_student_enrolled){
-		    string tmp;
+				if(!cCur->ph_student_enrolled){
+					string tmp;
                     getline(f,tmp,',');
                     getline(f,tmp,',');
                     cCur->ph_student_enrolled = new Node_student;
-					*cCur->ph_student_enrolled = *findStudent(ph_y,tmp);
+					*cCur->ph_student_enrolled = *findStudent(pHallyear,tmp);
 					stuCur = cCur->ph_student_enrolled;
 					for(int i = 0; i < 5; ++i)
 						getline(f,tmp,',');
@@ -42,7 +42,7 @@ void addStudentIntoCourse(Node_year*& ph_y){
 					getline(f,tmp,',');
                     getline(f,tmp,',');
 					stuCur->student_next = new Node_student;
-					*stuCur->student_next = *findStudent(ph_y,tmp);
+					*stuCur->student_next = *findStudent(pHallyear,tmp);
 					stuCur->student_next->student_next = 0;
 					stuCur = stuCur->student_next;
 					for(int i = 0; i < 5; ++i)
